@@ -1,0 +1,1 @@
+// <reference constants="react-scripts" />
