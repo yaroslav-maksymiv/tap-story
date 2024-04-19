@@ -42,3 +42,14 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.username
+
+
+class Notification(models.Model):
+    recipient = models.ForeignKey(UserAccount, related_name='notifications', on_delete=models.CASCADE)
+    sender = models.ForeignKey(UserAccount, null=True, blank=True, on_delete=models.SET_NULL)
+    message = models.TextField(max_length=5000)
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.sender if self.sender else "Application"} to {self.recipient.username}'
