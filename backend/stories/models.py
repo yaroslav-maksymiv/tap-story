@@ -24,9 +24,10 @@ class Story(Timestamp):
     description = models.TextField(max_length=5000)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='stories')
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='stories')
-    image = models.ImageField(upload_to='story_images')
-    likes = models.ManyToManyField(User, related_name='story_like')
+    image = models.ImageField(upload_to='story_images', blank=True, null=True)
+    likes = models.ManyToManyField(User, related_name='story_like', null=True, blank=True)
     views = models.IntegerField(default=0)
+    published = models.BooleanField(default=False)
 
     def get_count_likes(self):
         return self.likes.count()
@@ -74,6 +75,7 @@ class Episode(Timestamp):
 
 class Character(models.Model):
     name = models.CharField(max_length=50, unique=True)
+    story = models.ForeignKey(Story, related_name='characters', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
