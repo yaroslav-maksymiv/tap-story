@@ -29,7 +29,7 @@ class StorySerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         representation['likes_count'] = instance.get_count_likes()
         representation['comments_count'] = instance.get_count_comments()
-        representation['views'] = instance.views
+        representation['views'] = instance.get_count_views()
 
         if instance.image:
             representation['image'] = self.context['request'].build_absolute_uri(instance.image.url)
@@ -52,7 +52,7 @@ class CharacterSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    author = UserAccountSerializer()
+    author = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
     story = serializers.PrimaryKeyRelatedField(queryset=Story.objects.all())
 
     class Meta:
@@ -62,4 +62,8 @@ class CommentSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['likes_count'] = instance.get_count_likes()
+
+        if 'request' in self.context:
+            representation['author'] = UserAccountSerializer(instance.author).data
+
         return representation

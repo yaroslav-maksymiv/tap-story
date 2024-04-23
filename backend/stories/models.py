@@ -12,6 +12,13 @@ class Timestamp(models.Model):
         abstract = True
 
 
+class IpAddress(models.Model):
+    ip = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.ip
+
+
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
@@ -26,8 +33,15 @@ class Story(Timestamp):
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='stories')
     image = models.ImageField(upload_to='story_images', blank=True, null=True)
     likes = models.ManyToManyField(User, related_name='story_like', null=True, blank=True)
-    views = models.IntegerField(default=0)
+    views = models.ManyToManyField(IpAddress, blank=True, null=True)
     published = models.BooleanField(default=False)
+    publish_date = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def get_count_views(self):
+        return self.views.count()
 
     def get_count_likes(self):
         return self.likes.count()
@@ -44,6 +58,9 @@ class Comment(Timestamp):
     story = models.ForeignKey(Story, related_name='comments', on_delete=models.CASCADE)
     text = models.TextField(max_length=2000)
     likes = models.ManyToManyField(User, related_name='comment_like')
+
+    class Meta:
+        ordering = ['-created_at']
 
     def get_count_likes(self):
         return self.likes.count()
