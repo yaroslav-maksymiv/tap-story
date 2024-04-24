@@ -8,10 +8,12 @@ from django.contrib.auth import get_user_model
 from datetime import datetime
 
 from .models import (
-    Category, Story, Character, Comment, IpAddress
+    Category, Story, Character,
+    Comment, IpAddress, SavedStory
 )
 from .serializers import (
-    StorySerializer, CategorySerializer, CommentSerializer, CharacterSerializer
+    StorySerializer, CategorySerializer, CommentSerializer,
+    CharacterSerializer, SavedStorySerializer
 )
 from .pagination import MyPagePagination
 from authentication.serializers import (
@@ -44,10 +46,10 @@ class StoryViewSet(ModelViewSet):
         queryset = self.filter_queryset(self.queryset)
         # queryset = queryset.filter(published=True)
         page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(queryset, many=True)
         if page:
-            serializer = self.get_serializer(queryset, many=True)
             return self.get_paginated_response(serializer.data)
-        return Response({"error": "Pagination parameters are invalid"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.data)
 
     def retrieve(self, request, pk=None, *args, **kwargs):
         story = get_object_or_404(self.queryset, pk=pk)
@@ -139,11 +141,11 @@ class StoryViewSet(ModelViewSet):
     def get_comments(self, request, pk=None):
         story = get_object_or_404(Story, pk=pk)
         queryset = story.comments.all()
+        serializer = CommentSerializer(queryset, many=True)
         page = self.paginate_queryset(queryset)
         if page:
-            serializer = CommentSerializer(queryset, many=True)
             return self.get_paginated_response(serializer.data)
-        Response({"error": "Pagination parameters are invalid"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.data)
 
 
 class CharacterViewSet(ModelViewSet):
@@ -237,3 +239,39 @@ class CommentViewSet(ModelViewSet):
         else:
             comment.likes.add(user)
             return Response({'liked': True}, status=status.HTTP_200_OK)
+
+
+class SavedStoryViewSet(ModelViewSet):
+    queryset = SavedStory.objects.all()
+    pagination_class = MyPagePagination
+    serializer_class = SavedStorySerializer
+    permission_classes = [IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        story = get_object_or_404(Story, pk=request.data.get('story'))
+        save_date = {
+            'user': request.user.id,
+            'story': story.id
+        }
+        serializer = self.get_serializer(data=save_date)
+        if serializer.is_valid():
+            saved_story = serializer.save()
+            return Response(self.get_serializer(saved_story).data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def list(self, request, *args, **kwargs):
+        user = request.user
+        queryset = self.get_queryset().filter(user=user)
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(queryset, many=True)
+        if page:
+            return self.get_paginated_response(serializer.data)
+        return Response(serializer.data)
+
+    def destroy(self, request, pk=None, *args, **kwargs):
+        instance = self.get_object()
+        user = request.user
+        if instance.user == user:
+            instance.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_403_FORBIDDEN)

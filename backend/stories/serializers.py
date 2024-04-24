@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 from .models import (
-    Category, Story, Character, Comment
+    Category, Story, Character, Comment, SavedStory
 )
 from authentication.serializers import (
     UserAccountSerializer
@@ -18,9 +18,6 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class StorySerializer(serializers.ModelSerializer):
-    author = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
-    category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all())
-
     class Meta:
         model = Story
         fields = ['id', 'title', 'description', 'author', 'category', 'image']
@@ -44,17 +41,12 @@ class StorySerializer(serializers.ModelSerializer):
 
 
 class CharacterSerializer(serializers.ModelSerializer):
-    story = serializers.PrimaryKeyRelatedField(queryset=Story.objects.all())
-
     class Meta:
         model = Character
         fields = ['id', 'name', 'story']
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    author = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
-    story = serializers.PrimaryKeyRelatedField(queryset=Story.objects.all())
-
     class Meta:
         model = Comment
         fields = ['id', 'author', 'story', 'text']
@@ -67,3 +59,9 @@ class CommentSerializer(serializers.ModelSerializer):
             representation['author'] = UserAccountSerializer(instance.author).data
 
         return representation
+
+
+class SavedStorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SavedStory
+        fields = ['user', 'story', 'saved_at']
