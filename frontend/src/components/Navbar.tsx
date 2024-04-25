@@ -67,15 +67,18 @@ export const Navbar: React.FC = () => {
                             <li>
                                 <Link to={'/'}
                                       className="block py-2 pr-4 pl-3 text-white rounded bg-primary-700 lg:bg-transparent lg:text-primary-700 lg:p-0 dark:text-white"
-                                      aria-current="page">Main 👻</Link>
+                                      aria-current="page">Main 💻</Link>
                             </li>
-                            <li><Link to={'/'}
+                            <li><Link to={'/search'}
+                                      className="block py-2 pr-4 pl-3 text-white rounded bg-primary-700 lg:bg-transparent lg:text-primary-700 lg:p-0 dark:text-white"
+                                      aria-current="page">Search 🔎</Link></li>
+                            <li><Link to={'/top-ranked'}
                                       className="block py-2 pr-4 pl-3 text-white rounded bg-primary-700 lg:bg-transparent lg:text-primary-700 lg:p-0 dark:text-white"
                                       aria-current="page">Top Ranked 🏆</Link></li>
                             <li>
-                                <Link to={'/'}
+                                <div
                                       className="block py-2 pr-4 pl-3 text-white rounded bg-primary-700 lg:bg-transparent lg:text-primary-700 lg:p-0 dark:text-white"
-                                      aria-current="page">Random Story 🎲</Link>
+                                      aria-current="page">Random Story 🎲</div>
                             </li>
                         </ul>
                     </div>

@@ -15,7 +15,7 @@ class CategoryFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Category
 
-    name = 'test_category'
+    name = factory.Sequence(lambda n: f'category_{n}')
 
 
 class IpAddressFactory(factory.django.DjangoModelFactory):

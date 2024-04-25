@@ -1,5 +1,6 @@
 import {PayloadAction, createSlice} from "@reduxjs/toolkit";
 import {loadUser, login, register, checkIsAuthenticated, activate} from "./authenticationThunks";
+import {createErrorsList} from "../../miscellaneous";
 
 type User = {
     id: number
@@ -41,16 +42,6 @@ const setAuthentication = (state: AuthenticationState, isAuthenticated: boolean)
     localStorage.setItem('isAuthenticated', authStatus)
     state.isAuthenticated = isAuthenticated
     state.isAccountActivated = isAuthenticated
-}
-
-const createErrorsList = (payload: any): string[] => {
-    let errorsList: string[] = []
-    for (const [key, values] of Object.entries(payload)) {
-        for (const value of (values as string[])) {
-            errorsList.push(value.charAt(0).toUpperCase() + value.slice(1))
-        }
-    }
-    return errorsList
 }
 
 const authenticationSlice = createSlice({
