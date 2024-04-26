@@ -2,7 +2,7 @@ import {PayloadAction, createSlice} from "@reduxjs/toolkit";
 import {loadUser, login, register, checkIsAuthenticated, activate} from "./authenticationThunks";
 import {createErrorsList} from "../../miscellaneous";
 
-type User = {
+export type User = {
     id: number
     email: string
     username: string

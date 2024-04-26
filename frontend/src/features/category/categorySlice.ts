@@ -1,7 +1,7 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {listCategories} from "./categoryThunks";
 
-type Category = {
+export type Category = {
     id: number
     name: string
 }

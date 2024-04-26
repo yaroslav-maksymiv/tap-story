@@ -56,8 +56,6 @@ class TestStoryModel:
         assert story.image is not None
         assert story.author is not None
         assert story.category is not None
-        assert story.published
-        assert story.publish_date is not None
 
     def test_adding_views(self, story_factory, ip_address_factory):
         ip_address = ip_address_factory()

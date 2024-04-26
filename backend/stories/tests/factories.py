@@ -1,5 +1,6 @@
 import factory
 
+from datetime import datetime
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 
@@ -28,9 +29,11 @@ class IpAddressFactory(factory.django.DjangoModelFactory):
 class UserFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = User
+        skip_postgeneration_save = True
 
-    username = factory.Faker('user_name')
-    email = factory.Faker('email')
+    username = factory.Sequence(lambda u: f'user_{u}')
+    email = factory.LazyAttribute(lambda o: f'{o.username}@example.com')
+    password = factory.PostGenerationMethodCall('set_password', 'password')
     first_name = factory.Faker('first_name')
     last_name = factory.Faker('last_name')
     photo = factory.Faker('image_url', width=200, height=200)
@@ -49,8 +52,8 @@ class StoryFactory(factory.django.DjangoModelFactory):
     author = factory.SubFactory(UserFactory)
     category = factory.SubFactory(CategoryFactory)
     image = factory.Faker('image_url', width=200, height=200)
-    published = True
-    publish_date = factory.Faker('date_time_ad', tzinfo=timezone.get_current_timezone())
+    published = False
+    publish_date = None
 
     @factory.post_generation
     def views(self, create, extracted, **kwargs):
@@ -88,3 +91,20 @@ class CommentFactory(factory.django.DjangoModelFactory):
         if extracted:
             for like in extracted:
                 self.likes.add(like)
+
+
+class CharacterFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Character
+
+    name = factory.Sequence(lambda n: f'Character name {n}')
+    story = factory.SubFactory(StoryFactory)
+
+
+class SavedStoryFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = SavedStory
+
+    user = factory.SubFactory(UserFactory)
+    story = factory.SubFactory(StoryFactory)
+    saved_at = factory.LazyFunction(datetime.now)

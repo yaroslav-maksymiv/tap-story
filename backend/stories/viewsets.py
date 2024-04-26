@@ -104,7 +104,7 @@ class StoryViewSet(ModelViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_403_FORBIDDEN)
 
-    @action(detail=True, methods=['POST'], url_path='publish', url_name='story-publish')
+    @action(detail=True, methods=['POST'], url_path='publish', url_name='publish')
     def publish_story(self, request, pk=None):
         story = get_object_or_404(self.queryset, pk=pk)
 
@@ -117,7 +117,7 @@ class StoryViewSet(ModelViewSet):
         return Response(status=status.HTTP_403_FORBIDDEN)
 
     @action(detail=True, methods=['POST'], url_path='toggle-like', url_name='toggle-like')
-    def toggle_like(self, request):
+    def toggle_like(self, request, pk=None):
         story = self.get_object()
         user = request.user
 
