@@ -1,7 +1,7 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {User} from "../authentication/authenticationSlice";
 import {Category} from "../category/categorySlice";
-import {listStories} from "./storyThunks";
+import {listStories, singleStory} from "./storyThunks";
 import {PaginatedResponse} from "../../types";
 
 export type Story = {
@@ -24,6 +24,7 @@ type StoryState = {
     page_size: number | null
     nextLink: string | null
     previousLink: string | null
+    story: Story | null
 }
 
 const initialState: StoryState = {
@@ -33,7 +34,8 @@ const initialState: StoryState = {
     page: 1,
     page_size: null,
     nextLink: null,
-    previousLink: null
+    previousLink: null,
+    story: null
 }
 
 const storySlice = createSlice({
@@ -51,9 +53,22 @@ const storySlice = createSlice({
             state.page_size = action.payload.page_size
             state.nextLink = action.payload.links.next
             state.previousLink = action.payload.links.previous
+            state.loading = false
         })
         builder.addCase(listStories.rejected, (state) => {
             state.loading = false
+            state.stories = []
+        })
+        builder.addCase(singleStory.pending, (state) => {
+            state.loading = true
+        })
+        builder.addCase(singleStory.fulfilled, (state, action: PayloadAction<Story>) => {
+            state.story = action.payload
+            state.loading = false
+        })
+        builder.addCase(singleStory.rejected, (state) => {
+            state.loading = false
+            state.story = null
         })
     }
 })

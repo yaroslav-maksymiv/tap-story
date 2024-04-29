@@ -7,6 +7,7 @@ import {Home} from "./screens/Home";
 import Layout from "./hocs/Layout";
 import {AccountActivation} from "./features/authentication/AccountActivation";
 import {Search} from "./screens/Search";
+import {Story} from "./features/story/Story";
 
 const App: React.FC = () => {
     return (
@@ -15,6 +16,7 @@ const App: React.FC = () => {
                 <Routes>
                     <Route path='/' element={<Home/>}/>
                     <Route path='/search' element={<Search/>}/>
+                    <Route path='/story/:id' element={<Story/>}/>
                     <Route path='/login' element={<Login/>}/>
                     <Route path='/register' element={<Register/>}/>
                     <Route path='/activate/:uid/:token' element={<AccountActivation/>}/>
