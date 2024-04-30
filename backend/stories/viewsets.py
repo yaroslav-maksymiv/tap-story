@@ -44,21 +44,18 @@ class StoryViewSet(ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.queryset)
-        # queryset = queryset.filter(published=True)
-        page = self.paginate_queryset(queryset)
+        self.paginate_queryset(queryset)
         serializer = self.get_serializer(queryset, many=True)
-        if page:
-            return self.get_paginated_response(serializer.data)
-        return Response(serializer.data)
+        return self.get_paginated_response(serializer.data)
 
     def retrieve(self, request, pk=None, *args, **kwargs):
         story = get_object_or_404(self.queryset, pk=pk)
 
         # Handle views
         ip = get_client_ip(request)
-        if not IpAddress.objects.filter(ip=ip).exists():
-            IpAddress.objects.create(ip=ip)
-            story.views.add(IpAddress.objects.get(ip=ip))
+        if not story.views.filter(ip=ip).exists():
+            ip_address, created = IpAddress.objects.get_or_create(ip=ip)
+            story.views.add(ip_address.id)
 
         serializer = self.get_serializer(story)
         return Response(serializer.data)
@@ -141,11 +138,9 @@ class StoryViewSet(ModelViewSet):
     def get_comments(self, request, pk=None):
         story = get_object_or_404(Story, pk=pk)
         queryset = story.comments.all()
-        serializer = CommentSerializer(queryset, many=True)
-        page = self.paginate_queryset(queryset)
-        if page:
-            return self.get_paginated_response(serializer.data)
-        return Response(serializer.data)
+        serializer = CommentSerializer(queryset, many=True, context={'request': request})
+        self.paginate_queryset(queryset)
+        return self.get_paginated_response(serializer.data)
 
 
 class CharacterViewSet(ModelViewSet):
@@ -217,7 +212,7 @@ class CommentViewSet(ModelViewSet):
 
     def partial_update(self, request, pk=None, *args, **kwargs):
         instance = self.get_object()
-        if instance.story.author == request.user:
+        if instance.author == request.user:
             update_data = {
                 'text': request.data.get('text')
             }

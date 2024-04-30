@@ -17,6 +17,70 @@ class TestCategoryEndpoints:
         assert len(json.loads(response.content)) == 4
 
 
+class TestCommentEndpoints:
+    def test_create(self, story_factory, user_factory, get_jwt_token, api_client):
+        url = reverse('comments-list')
+        author = user_factory()
+        token = get_jwt_token(current_user=author)
+        story = story_factory()
+        text = 'new comment'
+        data = {
+            'author': author.id,
+            'story': story.id,
+            'text': text
+        }
+        api_client.credentials(HTTP_AUTHORIZATION=f'JWT {token}')
+
+        response = api_client.post(url, data=data, format='json')
+        response_data = json.loads(response.content)
+        assert response.status_code == 201
+        assert response_data.get('text') == text
+        assert int(response_data.get('author').get('id')) == author.id
+
+    def test_delete(self, user_factory, comment_factory, get_jwt_token, api_client):
+        author = user_factory()
+        comment = comment_factory(author=author)
+        token = get_jwt_token(current_user=author)
+        url = reverse('comments-detail', args=[comment.pk])
+        api_client.credentials(HTTP_AUTHORIZATION=f'JWT {token}')
+
+        response = api_client.delete(url)
+        assert response.status_code == 204
+
+    def test_update(self, comment_factory, user_factory, get_jwt_token, api_client):
+        author = user_factory()
+        token = get_jwt_token(current_user=author)
+        comment = comment_factory(author=author, text='update comment')
+        url = reverse('comments-detail', args=[comment.pk])
+        api_client.credentials(HTTP_AUTHORIZATION=f'JWT {token}')
+        new_text = 'new update comment text'
+        data = {
+            'text': new_text
+        }
+
+        response = api_client.patch(url, data=data, format='json')
+        response_data = json.loads(response.content)
+        assert response.status_code == 200
+        assert response_data.get('text') == new_text
+
+    def test_toggle_like(self, user_factory, comment_factory, get_jwt_token, api_client):
+        user = user_factory()
+        comment = comment_factory()
+        token = get_jwt_token(current_user=user)
+        url = reverse('comments-toggle-like', args=[comment.pk])
+        api_client.credentials(HTTP_AUTHORIZATION=f'JWT {token}')
+
+        response = api_client.post(url, format='json')
+        data = json.loads(response.content)
+        assert response.status_code == 200
+        assert data.get('liked') == True
+
+        response = api_client.post(url, format='json')
+        data = json.loads(response.content)
+        assert response.status_code == 200
+        assert data.get('liked') == False
+
+
 class TestStoryEndpoints:
     def test_stories_get(self, story_factory, api_client):
         url = reverse('stories-list')
@@ -136,3 +200,4 @@ class TestStoryEndpoints:
         data = json.loads(response.content)
         assert response.status_code == 200
         assert data.get('liked') == False
+

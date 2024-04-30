@@ -14,6 +14,7 @@ class Timestamp(models.Model):
 
 class IpAddress(models.Model):
     ip = models.CharField(max_length=255)
+    # story = models.ForeignKey('Story', related_name='ip_addresses', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.ip

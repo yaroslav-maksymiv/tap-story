@@ -54,6 +54,7 @@ class CommentSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['likes_count'] = instance.get_count_likes()
+        del representation['story']
 
         if 'request' in self.context:
             representation['author'] = UserAccountSerializer(instance.author).data
