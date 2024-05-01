@@ -3,10 +3,10 @@ from pytest_factoryboy import register
 from rest_framework.test import APIClient
 from django.shortcuts import reverse
 
-from .factories import (
+from factories import (
     CategoryFactory, StoryFactory, UserFactory,
     IpAddressFactory, CommentFactory, CharacterFactory,
-    SavedStoryFactory
+    SavedStoryFactory, NotificationFactory
 )
 
 register(CategoryFactory)
@@ -16,6 +16,7 @@ register(IpAddressFactory)
 register(CommentFactory)
 register(CharacterFactory)
 register(SavedStoryFactory)
+register(NotificationFactory)
 
 
 @pytest.fixture

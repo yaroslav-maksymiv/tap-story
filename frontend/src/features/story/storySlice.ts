@@ -1,7 +1,7 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {User} from "../authentication/authenticationSlice";
 import {Category} from "../category/categorySlice";
-import {listStories, singleStory} from "./storyThunks";
+import {listStories, singleStory, toggleLikeStory} from "./storyThunks";
 import {PaginatedResponse} from "../../types";
 
 export type Story = {
@@ -14,6 +14,7 @@ export type Story = {
     likes_count: number
     comments_count: number
     views: number
+    is_liked: boolean
 }
 
 type StoryState = {
@@ -69,6 +70,17 @@ const storySlice = createSlice({
         builder.addCase(singleStory.rejected, (state) => {
             state.loading = false
             state.story = null
+        })
+        builder.addCase(toggleLikeStory.fulfilled, (state, action) => {
+            const liked_value = action.payload.liked
+            if (state.story) {
+                state.story.is_liked = action.payload.liked
+                if (liked_value) {
+                    state.story.likes_count++
+                } else {
+                    state.story.likes_count--
+                }
+            }
         })
     }
 })

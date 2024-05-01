@@ -2,6 +2,8 @@ from djoser.serializers import UserSerializer
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
+from .models import Notification
+
 User = get_user_model()
 
 
@@ -29,4 +31,12 @@ class UserAccountCreateSerializer(UserSerializer):
         model = User
         fields = [
             'id', 'username', 'email', 'password'
+        ]
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = [
+            'id', 'recipient', 'sender', 'message', 'created_at'
         ]

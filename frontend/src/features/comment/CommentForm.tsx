@@ -13,7 +13,10 @@ export const CommentForm: React.FC<Props> = ({id}) => {
     const navigate = useNavigate()
 
     const {isAuthenticated} = useAppSelector(state => state.authentication)
-    const {singleLoading, singleError, comment} = useAppSelector(state => state.comment)
+    const {loading: loadingCreate, error: errorCreate, comment} = useAppSelector(state => state.comment)
+    const loading = loadingCreate.create
+    const error = errorCreate.create
+
     const [text, setText] = useState<string>('')
     const [warning, setWarning] = useState<string>('')
 
@@ -64,12 +67,13 @@ export const CommentForm: React.FC<Props> = ({id}) => {
                     Comment
                 </label>
                 <textarea
+                    value={text}
                     onChange={(e) => setText(e.target.value)}
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-400 bg-gray-800 leading-tight focus:outline-none focus:shadow-outline"
                     id="comment" placeholder="Enter your comment"></textarea>
             </div>
             <button
-                disabled={singleLoading}
+                disabled={loading}
                 onClick={(e) => handleSubmit(e)}
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                 Submit

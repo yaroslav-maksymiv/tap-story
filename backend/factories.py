@@ -4,9 +4,12 @@ from datetime import datetime
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 
-from ..models import (
+from stories.models import (
     Category, Story, SavedStory,
     Comment, Character, IpAddress
+)
+from authentication.models import (
+    Notification
 )
 
 User = get_user_model()
@@ -108,3 +111,15 @@ class SavedStoryFactory(factory.django.DjangoModelFactory):
     user = factory.SubFactory(UserFactory)
     story = factory.SubFactory(StoryFactory)
     saved_at = factory.LazyFunction(datetime.now)
+
+
+class NotificationFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Notification
+
+    recipient = factory.SubFactory(UserFactory)
+    sender = None
+    message = 'notification message text'
+    is_read = False
+    created_at = factory.LazyFunction(datetime.now)
+    

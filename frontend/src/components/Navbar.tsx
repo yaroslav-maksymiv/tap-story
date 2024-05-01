@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import {Link} from "react-router-dom";
 import {useAppDispatch, useAppSelector} from "../app/hooks";
 import {logout} from "../features/authentication/authenticationSlice";
@@ -7,14 +7,32 @@ export const Navbar: React.FC = () => {
     const dispatch = useAppDispatch()
     const {isAuthenticated, user} = useAppSelector(state => state.authentication)
 
+    const [notificationsVisible, setNotificationsVisible] = useState<boolean>(false)
+
     const handleLogout = () => {
         dispatch(logout())
     }
 
     return (
-        <header>
+        <header className="fixed z-20">
+
+            {notificationsVisible && (
+                <div className="fixed bg-gray-800 text-white h-screen z-10 w-96 right-0 pt-24 px-5">
+                    <div className="flex items-center justify-between">
+                        <div className="text-lg">Notifications</div>
+                        <svg onClick={() => setNotificationsVisible(false)} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                             stroke="currentColor" className="cursor-pointer w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+                        </svg>
+                    </div>
+                    <div className="mt-10">
+                        <div className="">some notification</div>
+                    </div>
+                </div>
+            )}
+
             <nav
-                className="absolute top-0 left-0 w-screen bg-white border-gray-200 px-4 lg:px-6 py-2.5 dark:bg-gray-900">
+                className="absolute z-20 top-0 left-0 w-screen bg-white border-gray-200 px-4 lg:px-6 py-2.5 dark:bg-gray-900">
                 <div className="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl">
                     <Link to={'/'} className="flex items-center">
                         <img src={require("../assets/logo.png")} className="mr-3 h-6 sm:h-9"
@@ -22,8 +40,16 @@ export const Navbar: React.FC = () => {
                         <span
                             className="self-center text-xl font-semibold whitespace-nowrap dark:text-white">Tap Story</span>
                     </Link>
-                    <div className="flex items-center lg:order-2">
+                    <div className="flex items-center lg:order-2 relative">
                         {isAuthenticated ? (<>
+                            <div onClick={() => setNotificationsVisible(prev => !prev)} className="flex gap-1 items-center mr-4 text-white cursor-pointer">
+                                3
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                     stroke-width="1.5" stroke="currentColor" className="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"/>
+                                </svg>
+                            </div>
                             {user?.photo ? (<Link to={'/'}>
                                 <img src={require("../assets/avatar.jpg")} className="w-10 h-10 rounded-full"
                                      alt="Avatar"/>
@@ -77,8 +103,9 @@ export const Navbar: React.FC = () => {
                                       aria-current="page">Top Ranked 🏆</Link></li>
                             <li>
                                 <div
-                                      className="block py-2 pr-4 pl-3 text-white rounded bg-primary-700 lg:bg-transparent lg:text-primary-700 lg:p-0 dark:text-white"
-                                      aria-current="page">Random Story 🎲</div>
+                                    className="block py-2 pr-4 pl-3 text-white rounded bg-primary-700 lg:bg-transparent lg:text-primary-700 lg:p-0 dark:text-white"
+                                    aria-current="page">Random Story 🎲
+                                </div>
                             </li>
                         </ul>
                     </div>

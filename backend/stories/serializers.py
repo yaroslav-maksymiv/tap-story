@@ -18,9 +18,11 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class StorySerializer(serializers.ModelSerializer):
+    is_liked = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = Story
-        fields = ['id', 'title', 'description', 'author', 'category', 'image']
+        fields = ['id', 'title', 'description', 'author', 'category', 'image', 'is_liked']
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -39,6 +41,16 @@ class StorySerializer(serializers.ModelSerializer):
 
         return representation
 
+    def get_is_liked(self, obj):
+        request = self.context.get('request')
+        if request:
+            user = request.user
+            if user.is_authenticated:
+                if user in obj.likes.all():
+                    return True
+            return False
+        return False
+
 
 class CharacterSerializer(serializers.ModelSerializer):
     class Meta:
@@ -47,9 +59,11 @@ class CharacterSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    is_liked = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = Comment
-        fields = ['id', 'author', 'story', 'text']
+        fields = ['id', 'author', 'story', 'text', 'is_liked']
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -61,8 +75,24 @@ class CommentSerializer(serializers.ModelSerializer):
 
         return representation
 
+    def get_is_liked(self, obj):
+        request = self.context.get('request')
+        if request:
+            user = request.user
+            if user.is_authenticated:
+                if user in obj.likes.all():
+                    return True
+            return False
+        return False
+
 
 class SavedStorySerializer(serializers.ModelSerializer):
     class Meta:
         model = SavedStory
         fields = ['user', 'story', 'saved_at']
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['story'] = StorySerializer(instance.story).data
+        return representation
+

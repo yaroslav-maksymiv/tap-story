@@ -1,6 +1,6 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {User} from "../authentication/authenticationSlice";
-import {createComment, listComments} from "./commentThunk";
+import {createComment, deleteComment, listComments} from "./commentThunk";
 import {PaginatedResponse} from "../../types";
 
 type Comment = {
@@ -17,36 +17,52 @@ type CommentState = {
     page_size: number | null
     nextLink: string | null
     previousLink: string | null
-    loading: boolean
-    singleLoading: boolean
-    comments: Comment[]
-    error: string | null
-    singleError: string | null
+    loading: {
+        list: boolean
+        create: boolean
+        delete: boolean
+    }
+    error: {
+        list: string | null
+        create: string | null
+        delete: string | null
+    }
     comment: Comment | null
+    comments: Comment[]
 }
 
 const initialState: CommentState = {
-    loading: false,
-    comments: [],
+    loading: {
+        list: false,
+        create: false,
+        delete: false
+    },
+    error: {
+        list: null,
+        create: null,
+        delete: null
+    },
     total: null,
     page: 1,
     page_size: null,
     nextLink: null,
     previousLink: null,
-    error: null,
-    singleLoading: false,
-    singleError: null,
-    comment: null
+    comments: [],
+    comment: null,
 }
 
 const commentSlice = createSlice({
     name: 'comment',
     initialState,
-    reducers: {},
+    reducers: {
+        deleteCommentSuccess(state, action: PayloadAction<number>) {
+            state.comments = state.comments.filter(comment => comment.id !== action.payload)
+        }
+    },
     extraReducers: (builder) => {
         builder.addCase(listComments.pending, (state) => {
-            state.loading = true
-            state.error = null
+            state.loading.list = true
+            state.error.list = null
         })
         builder.addCase(listComments.fulfilled, (state, action: PayloadAction<PaginatedResponse<Comment>>) => {
             state.comments = action.payload.results
@@ -55,27 +71,37 @@ const commentSlice = createSlice({
             state.page_size = action.payload.page_size
             state.nextLink = action.payload.links.next
             state.previousLink = action.payload.links.previous
-            state.loading = false
-            state.error = null
+            state.loading.list = false
+            state.error.list = null
         })
         builder.addCase(listComments.rejected, (state, action) => {
-            state.loading = false
-            state.error = action.payload as string
+            state.loading.list = false
+            state.error.list = action.payload as string
         })
         builder.addCase(createComment.pending, (state) => {
-            state.singleLoading = true
-            state.singleError = null
+            state.loading.create = true
+            state.error.create = null
         })
         builder.addCase(createComment.fulfilled, (state, action: PayloadAction<Comment>) => {
-            state.singleLoading = false
-            state.singleError = null
+            state.loading.create = false
+            state.error.create = null
             state.comment = action.payload
         })
         builder.addCase(createComment.rejected, (state, action) => {
-            state.singleError = action.payload as string
-            state.singleLoading = false
+            state.error.create = action.payload as string
+            state.loading.create = false
+        })
+        builder.addCase(deleteComment.pending, (state) => {
+            state.error.delete = null
+        })
+        builder.addCase(deleteComment.fulfilled, (state) => {
+            state.error.delete = null
+        })
+        builder.addCase(deleteComment.rejected, (state, action) => {
+            state.error.delete = action.payload as string
         })
     }
 })
 
 export default commentSlice.reducer
+export const { deleteCommentSuccess } = commentSlice.actions

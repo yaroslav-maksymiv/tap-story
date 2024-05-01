@@ -17,7 +17,7 @@ from .serializers import (
 )
 from .pagination import MyPagePagination
 from authentication.serializers import (
-    UserAccountSerializer
+    UserAccountSerializer, Notification
 )
 
 User = get_user_model()
@@ -57,7 +57,7 @@ class StoryViewSet(ModelViewSet):
             ip_address, created = IpAddress.objects.get_or_create(ip=ip)
             story.views.add(ip_address.id)
 
-        serializer = self.get_serializer(story)
+        serializer = self.get_serializer(story, context={'request': request})
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
@@ -191,14 +191,21 @@ class CommentViewSet(ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         story = get_object_or_404(Story, pk=request.data.get('story'))
+        comment_text = request.data.get('text')
         comment_data = {
             'author': request.user.id,
             'story': story.id,
-            'text': request.data.get('text')
+            'text': comment_text
         }
         serializer = self.get_serializer(data=comment_data)
         if serializer.is_valid():
             comment = serializer.save()
+
+            # create notification
+            if request.user != story.author:
+                message = f'{request.user} commented your story "{story.title}": {comment_text}'
+                Notification.objects.create(recipient=story.author, message=message)
+
             return Response(self.get_serializer(comment).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

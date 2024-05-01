@@ -42,3 +42,22 @@ export const createComment = createAsyncThunk('comment/create', async (credentia
         return thunkAPI.rejectWithValue(err.message)
     }
 })
+
+export const deleteComment = createAsyncThunk('comment/delete', async (credentials: {
+    id: number
+}, thunkAPI) => {
+    const config = {
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `JWT ${localStorage.getItem('access')}`
+        }
+    }
+
+    try {
+        const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/comments/${credentials.id}/`, config)
+        return response.data
+    } catch (err: any) {
+        return thunkAPI.rejectWithValue(err.message)
+    }
+})
