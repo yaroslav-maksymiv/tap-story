@@ -30,13 +30,14 @@ SECRET_KEY = 'django-insecure-q9l-qfjj*vtuas_)ez2_!!jd5vaetq-iev&qtimk*)$v-ej4*)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 CORS_ALLOW_ALL_ORIGINS = True
 
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -82,7 +83,14 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'core.wsgi.application'
+# WSGI_APPLICATION = 'core.wsgi.application'
+ASGI_APPLICATION = 'core.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': "channels.layers.InMemoryChannelLayer"
+    }
+}
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
