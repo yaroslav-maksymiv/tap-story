@@ -1,13 +1,23 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 import {useAppDispatch, useAppSelector} from "../app/hooks";
 import {logout} from "../features/authentication/authenticationSlice";
+import {Notifications} from "../features/notification/Notifications";
+import {resetNotificationsCount} from "../features/notification/notificationSlice";
 
 export const Navbar: React.FC = () => {
     const dispatch = useAppDispatch()
+
     const {isAuthenticated, user} = useAppSelector(state => state.authentication)
+    const {notificationsCount} = useAppSelector(state => state.notification)
 
     const [notificationsVisible, setNotificationsVisible] = useState<boolean>(false)
+
+    useEffect(() => {
+        if (notificationsVisible) {
+            dispatch(resetNotificationsCount())
+        }
+    }, [notificationsVisible, notificationsCount])
 
     const handleLogout = () => {
         dispatch(logout())
@@ -17,18 +27,7 @@ export const Navbar: React.FC = () => {
         <header className="fixed z-20">
 
             {notificationsVisible && (
-                <div className="fixed bg-gray-800 text-white h-screen z-10 w-96 right-0 pt-24 px-5">
-                    <div className="flex items-center justify-between">
-                        <div className="text-lg">Notifications</div>
-                        <svg onClick={() => setNotificationsVisible(false)} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                             stroke="currentColor" className="cursor-pointer w-6 h-6">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
-                        </svg>
-                    </div>
-                    <div className="mt-10">
-                        <div className="">some notification</div>
-                    </div>
-                </div>
+                <Notifications setNotificationsVisible={setNotificationsVisible} />
             )}
 
             <nav
@@ -43,7 +42,7 @@ export const Navbar: React.FC = () => {
                     <div className="flex items-center lg:order-2 relative">
                         {isAuthenticated ? (<>
                             <div onClick={() => setNotificationsVisible(prev => !prev)} className="flex gap-1 items-center mr-4 text-white cursor-pointer">
-                                3
+                                {notificationsCount > 0 && <div>{notificationsCount}</div>}
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                      stroke-width="1.5" stroke="currentColor" className="w-5 h-5">
                                     <path stroke-linecap="round" stroke-linejoin="round"

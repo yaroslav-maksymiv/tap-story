@@ -8,10 +8,12 @@ import Layout from "./hocs/Layout";
 import {AccountActivation} from "./features/authentication/AccountActivation";
 import {Search} from "./screens/Search";
 import {Story} from "./features/story/Story";
+import {WebSocketComponent} from "./components/WebSocketComponent";
 
 const App: React.FC = () => {
     return (
         <BrowserRouter>
+            <WebSocketComponent />
             <Layout>
                 <Routes>
                     <Route path='/' element={<Home/>}/>

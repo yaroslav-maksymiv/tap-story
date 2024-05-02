@@ -1,5 +1,4 @@
 import json
-from asgiref.sync import async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer
 from urllib.parse import parse_qs
 from django.contrib.auth import get_user_model
@@ -12,8 +11,13 @@ class NotificationConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         params = parse_qs(self.scope['query_string'].decode())
         token = params.get('token', [None])[0]
-        token = AccessToken(token)
-        user_id = token.payload['user_id']
+
+        try:
+            token = AccessToken(token)
+            user_id = token.payload['user_id']
+        except Exception:
+            user_id = ''
+            await self.close()
 
         self.group_name = f'room_{user_id}'
         await self.channel_layer.group_add(

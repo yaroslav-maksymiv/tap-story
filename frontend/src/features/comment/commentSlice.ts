@@ -1,14 +1,16 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {User} from "../authentication/authenticationSlice";
-import {createComment, deleteComment, listComments} from "./commentThunk";
+import {createComment, deleteComment, listComments, toggleLikeComment} from "./commentThunk";
 import {PaginatedResponse} from "../../types";
+import {toggleLikeStory} from "../story/storyThunks";
 
-type Comment = {
+export type Comment = {
     id: number
     author: User
     story: number
     text: string
     likes_count: number
+    is_liked: boolean
 }
 
 type CommentState = {
@@ -99,6 +101,22 @@ const commentSlice = createSlice({
         })
         builder.addCase(deleteComment.rejected, (state, action) => {
             state.error.delete = action.payload as string
+        })
+        builder.addCase(toggleLikeComment.fulfilled, (state, action) => {
+            const liked_value = action.payload.liked
+            const id = action.payload.commentId
+            state.comments = state.comments.map(comment => {
+                if (comment.id === id) {
+                    let likesCount = comment.likes_count
+                    if (liked_value) {
+                        likesCount++
+                    } else {
+                        likesCount--
+                    }
+                    return {...comment, is_liked: liked_value, likes_count: likesCount}
+                }
+                return comment
+            })
         })
     }
 })

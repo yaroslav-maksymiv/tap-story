@@ -1,7 +1,8 @@
 import {useAppDispatch} from '../app/hooks'
-import {useEffect} from "react";
+import React, {useEffect} from "react";
 import {checkIsAuthenticated, loadUser} from "../features/authentication/authenticationThunks";
 import {Navbar} from "../components/Navbar";
+import {WebSocketComponent} from "../components/WebSocketComponent";
 
 const Layout = (props: any) => {
     const dispatch = useAppDispatch()

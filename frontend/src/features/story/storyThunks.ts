@@ -1,13 +1,6 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import axios from "axios";
-
-interface Config {
-    headers: {
-        'Content-Type': string
-        Accept: string
-        Authorization?: string
-    }
-}
+import {ConfigType} from "../../types";
 
 export const listStories = createAsyncThunk('story/list', async () => {
     const config = {
@@ -22,7 +15,7 @@ export const listStories = createAsyncThunk('story/list', async () => {
 })
 
 export const singleStory = createAsyncThunk('story/single', async (credentials: { id: string }) => {
-    const config: Config = {
+    const config: ConfigType = {
         headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',

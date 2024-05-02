@@ -10,3 +10,11 @@ export type PaginatedResponse<T> = {
     page_size: number
     results: T[]
 }
+
+export type ConfigType = {
+    headers: {
+        'Content-Type': string
+        Accept: string
+        Authorization?: string
+    }
+}

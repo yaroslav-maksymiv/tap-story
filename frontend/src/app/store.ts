@@ -4,13 +4,15 @@ import authenticationReducer from '../features/authentication/authenticationSlic
 import categoryReducer from '../features/category/categorySlice'
 import storyReducer from '../features/story/storySlice'
 import commentReducer from '../features/comment/commentSlice'
+import notificationReducer from '../features/notification/notificationSlice'
 
 const store = configureStore({
     reducer: {
         authentication: authenticationReducer,
         category: categoryReducer,
         story: storyReducer,
-        comment: commentReducer
+        comment: commentReducer,
+        notification: notificationReducer
     }
 })
 

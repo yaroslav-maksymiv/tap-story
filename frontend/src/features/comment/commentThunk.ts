@@ -1,13 +1,17 @@
-import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
+import {createAsyncThunk} from "@reduxjs/toolkit";
 import axios from "axios";
-import {logout} from "../authentication/authenticationSlice";
+import {ConfigType} from "../../types";
 
 export const listComments = createAsyncThunk('comment/list', async (credentials: { storyId: string }, thunkAPI) => {
-    const config = {
+    const config: ConfigType = {
         headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
         }
+    }
+
+    if (localStorage.getItem('isAuthenticated') == 'true') {
+        config.headers.Authorization = `JWT ${localStorage.getItem('access')}`
     }
 
     try {
@@ -60,4 +64,18 @@ export const deleteComment = createAsyncThunk('comment/delete', async (credentia
     } catch (err: any) {
         return thunkAPI.rejectWithValue(err.message)
     }
+})
+
+export const toggleLikeComment = createAsyncThunk('comment/toggleLike', async (credentials: { id: number }) => {
+    const config = {
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `JWT ${localStorage.getItem('access')}`
+        }
+    }
+
+    const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/comments/${credentials.id}/toggle-like/`, {}, config)
+    response.data['commentId'] = credentials.id
+    return response.data
 })
