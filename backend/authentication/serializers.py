@@ -35,8 +35,11 @@ class UserAccountCreateSerializer(UserSerializer):
 
 
 class NotificationSerializer(serializers.ModelSerializer):
+    sender = UserAccountSerializer(read_only=True)
+
     class Meta:
         model = Notification
         fields = [
-            'id', 'recipient', 'sender', 'message', 'created_at'
+            'id', 'recipient', 'sender', 'message', 'is_read', 'created_at'
         ]
+

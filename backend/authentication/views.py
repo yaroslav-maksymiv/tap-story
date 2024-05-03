@@ -7,12 +7,14 @@ from .models import (
 from .serializers import (
     NotificationSerializer
 )
+from stories.pagination import MyPagePagination
 
 
 class NotificationListAPIView(ListAPIView):
     queryset = Notification.objects.all()
     serializer_class = NotificationSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = MyPagePagination
 
     def get_queryset(self):
         queryset = super().get_queryset()

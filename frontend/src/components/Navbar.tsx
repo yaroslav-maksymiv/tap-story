@@ -41,7 +41,7 @@ export const Navbar: React.FC = () => {
                     </Link>
                     <div className="flex items-center lg:order-2 relative">
                         {isAuthenticated ? (<>
-                            <div onClick={() => setNotificationsVisible(prev => !prev)} className="flex gap-1 items-center mr-4 text-white cursor-pointer">
+                            <div onClick={() => setNotificationsVisible(prev => !prev)} className="notifications-open flex gap-1 items-center mr-4 text-white cursor-pointer">
                                 {notificationsCount > 0 && <div>{notificationsCount}</div>}
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                      stroke-width="1.5" stroke="currentColor" className="w-5 h-5">

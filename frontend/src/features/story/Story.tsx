@@ -45,15 +45,15 @@ export const Story: React.FC = () => {
             ) : error ? (
                 <div></div>
             ) : story && (
-                <div className="w-full flex gap-5">
-                    <div>
+                <div className="w-full flex gap-8">
+                    <div className="w-2/5">
                         <img
                             src={story.image ? story.image : 'https://st4.depositphotos.com/14953852/24787/v/450/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg'}
                             alt=""
                             className="rounded-md"
                         />
                     </div>
-                    <div>
+                    <div className="w-3/5">
                         <div className="text-6xl font-bold">{story.title}</div>
                         <div className="mt-5 flex gap-3 text-sm font-medium text-gray-400">
                             <div className="text-lg flex items-center gap-0.5 cursor-pointer">
@@ -84,7 +84,7 @@ export const Story: React.FC = () => {
                             </div>
                         </div>
                         <div className="mt-3 text-lg">{story.description}</div>
-                        <div className="flex gap-3 items-center mt-3">
+                        <div className="flex gap-3 items-center mt-5">
                             <div className="flex gap-1 text-lg items-center cursor-pointer">
                                 Save
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -95,7 +95,7 @@ export const Story: React.FC = () => {
                             </div>
                         </div>
                         <button
-                            className="btn mt-3 flex w-full justify-center rounded-md bg-blue-600 px-24 py-3 text-lg font-semibold leading-6 text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Read
+                            className="btn mt-5 flex w-full justify-center rounded-md bg-blue-600 px-24 py-3 text-lg font-semibold leading-6 text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Read
                         </button>
                     </div>
                 </div>

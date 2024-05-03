@@ -190,10 +190,11 @@ class CommentViewSet(ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def create(self, request, *args, **kwargs):
+        user = request.user
         story = get_object_or_404(Story, pk=request.data.get('story'))
         comment_text = request.data.get('text')
         comment_data = {
-            'author': request.user.id,
+            'author': user.id,
             'story': story.id,
             'text': comment_text
         }
@@ -203,8 +204,8 @@ class CommentViewSet(ModelViewSet):
 
             # create notification
             if request.user != story.author:
-                message = f'{request.user} commented your story "{story.title}": {comment_text}'
-                Notification.objects.create(recipient=story.author, message=message)
+                message = f'Commented story "{story.title}": {comment_text}'
+                Notification.objects.create(recipient=story.author, sender=user, message=message)
 
             return Response(self.get_serializer(comment).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

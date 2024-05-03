@@ -1,11 +1,14 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {listNotifications} from "./notificationThunk";
+import {User} from "../authentication/authenticationSlice";
+import {PaginatedResponse} from "../../types";
 
 type Notification = {
     id: number
     recipient: number
-    sender: number | null
+    sender: User | null
     message: string
+    is_read: boolean
     created_at: string
 }
 
@@ -14,13 +17,22 @@ type NotificationState = {
     loading: boolean
     error: string | null
     notificationsCount: number
+
+    total: number
+    page: number
+    nextLink: string | null
+    previousLink: string | null
 }
 
 const initialState: NotificationState = {
     notifications: [],
     loading: false,
     error: null,
-    notificationsCount: 0
+    notificationsCount: 0,
+    total: 0,
+    page: 1,
+    nextLink: null,
+    previousLink: null
 }
 
 const notificationSlice = createSlice({
@@ -40,9 +52,14 @@ const notificationSlice = createSlice({
             state.loading = true
             state.error = null
         })
-        builder.addCase(listNotifications.fulfilled, (state, action: PayloadAction<Notification[]>) => {
+        builder.addCase(listNotifications.fulfilled, (state, action: PayloadAction<PaginatedResponse<Notification>>) => {
+            const payload = action.payload
             state.loading = false
-            state.notifications = action.payload
+            state.notifications = payload.results
+            state.total = payload.total
+            state.page = payload.page
+            state.nextLink = payload.links.next
+            state.previousLink = payload.links.previous
         })
         builder.addCase(listNotifications.rejected, (state, action) => {
             state.loading = false

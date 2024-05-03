@@ -36,9 +36,14 @@ export const Comment: React.FC<Props> = ({comment}) => {
     }, [comment.is_liked])
 
     return (
-        <div className="comment bg-gray-700 p-4 rounded-lg shadow-md">
+        <div className="comment bg-gray-700 py-3 px-3 rounded-lg shadow-md">
             <div className="flex items-center justify-between">
-                <h3 className="text-lg font-bold text-white">{comment.author.username}</h3>
+                <div className="flex gap-1.5">
+                    <img className="rounded-full w-7 h-7 items-center"
+                         src={`${comment.author.photo ? comment.author.photo : require("../../assets/avatar.jpg")}`}
+                         alt=""/>
+                    <h3 className="text-md font-bold text-white">{comment.author.username}</h3>
+                </div>
                 {user?.username == comment.author.username && (
                     <svg onClick={() => handleDelete(comment.id)} xmlns="http://www.w3.org/2000/svg"
                          fill="none" viewBox="0 0 24 24"
@@ -50,12 +55,12 @@ export const Comment: React.FC<Props> = ({comment}) => {
                     </svg>
                 )}
             </div>
-            <p className="text-gray-300">
+            <p className="text-gray-300 text-lg">
                 {comment.text}
             </p>
 
             <div className="mt-2 cursor-pointer flex gap-1 items-center">
-                {comment.likes_count}
+                {comment.likes_count > 0 && comment.likes_count}
                 <div onClick={likeComment}>
                     {isLiked ? (
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
