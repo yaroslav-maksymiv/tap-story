@@ -1,9 +1,11 @@
 import React, {useEffect} from "react";
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
-import {deleteComment, listComments} from "./commentThunk";
+import {listComments} from "./commentThunk";
 import {Loading} from "../../components/Loading";
 import {CommentForm} from "./CommentForm";
 import {Comment} from "./Comment";
+import InfiniteScroll from "react-infinite-scroll-component";
+import {resetComments} from "./commentSlice";
 
 interface Props {
     id: string | null
@@ -12,14 +14,21 @@ interface Props {
 export const Comments: React.FC<Props> = ({id}) => {
     const dispatch = useAppDispatch()
 
-    const {comments, loading: loadingList} = useAppSelector(state => state.comment)
+    const {comments, hasMore, nextLink, loading: loadingList} = useAppSelector(state => state.comment)
     const loading = loadingList.list
 
     useEffect(() => {
         if (id) {
+            dispatch(resetComments())
             dispatch(listComments({storyId: id}))
         }
     }, [id])
+
+    const fetchMoreData = () => {
+        if (nextLink) {
+            dispatch(listComments({url: nextLink, storyId: 'random'}))
+        }
+    }
 
     return (
         <div className="w-full py-6 text-white">
@@ -30,9 +39,22 @@ export const Comments: React.FC<Props> = ({id}) => {
 
                 {loading ? (<div className="w-full h-full flex justify-center items-center">
                     <Loading/>
-                </div>) : comments?.length > 0 ? comments.map((comment) => (
-                    <Comment key={comment.id} comment={comment} />
-                )) : <div className="w-full h-full flex justify-center items-center">No comments yet</div>}
+                </div>) : comments?.length > 0 ? (
+                    <InfiniteScroll
+                        dataLength={comments.length}
+                        next={fetchMoreData}
+                        hasMore={hasMore}
+                        loader={<div className="flex w-full py-5 justify-center">
+                            <Loading size={50}/>
+                        </div>}
+                    >
+                        {comments.map((comment) => (
+                            <div className="mb-4">
+                                <Comment key={comment.id} comment={comment}/>
+                            </div>
+                        ))}
+                    </InfiniteScroll>
+                ) : <div className="w-full h-full flex justify-center items-center">No comments yet</div>}
             </div>
 
         </div>

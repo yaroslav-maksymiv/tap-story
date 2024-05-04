@@ -22,6 +22,8 @@ type NotificationState = {
     page: number
     nextLink: string | null
     previousLink: string | null
+    hasMore: boolean
+    firstLoad: boolean
 }
 
 const initialState: NotificationState = {
@@ -32,7 +34,9 @@ const initialState: NotificationState = {
     total: 0,
     page: 1,
     nextLink: null,
-    previousLink: null
+    previousLink: null,
+    hasMore: true,
+    firstLoad: true
 }
 
 const notificationSlice = createSlice({
@@ -49,17 +53,21 @@ const notificationSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder.addCase(listNotifications.pending, (state) => {
-            state.loading = true
+            if (state.firstLoad) {
+                state.loading = true
+            }
             state.error = null
         })
         builder.addCase(listNotifications.fulfilled, (state, action: PayloadAction<PaginatedResponse<Notification>>) => {
             const payload = action.payload
             state.loading = false
-            state.notifications = payload.results
+            state.notifications = [...state.notifications, ...payload.results]
             state.total = payload.total
             state.page = payload.page
             state.nextLink = payload.links.next
             state.previousLink = payload.links.previous
+            state.hasMore = !!payload.links.next
+            state.firstLoad = false
         })
         builder.addCase(listNotifications.rejected, (state, action) => {
             state.loading = false

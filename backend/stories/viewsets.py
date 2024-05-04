@@ -138,8 +138,8 @@ class StoryViewSet(ModelViewSet):
     def get_comments(self, request, pk=None):
         story = get_object_or_404(Story, pk=pk)
         queryset = story.comments.all()
+        queryset = self.paginate_queryset(queryset)
         serializer = CommentSerializer(queryset, many=True, context={'request': request})
-        self.paginate_queryset(queryset)
         return self.get_paginated_response(serializer.data)
 
 

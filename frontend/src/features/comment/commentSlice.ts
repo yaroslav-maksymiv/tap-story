@@ -16,9 +16,10 @@ export type Comment = {
 type CommentState = {
     total: number | null
     page: number
-    page_size: number | null
     nextLink: string | null
     previousLink: string | null
+    hasMore: boolean
+    firstLoad: boolean
     loading: {
         list: boolean
         create: boolean
@@ -46,11 +47,12 @@ const initialState: CommentState = {
     },
     total: null,
     page: 1,
-    page_size: null,
     nextLink: null,
     previousLink: null,
     comments: [],
     comment: null,
+    hasMore: true,
+    firstLoad: true
 }
 
 const commentSlice = createSlice({
@@ -59,22 +61,34 @@ const commentSlice = createSlice({
     reducers: {
         deleteCommentSuccess(state, action: PayloadAction<number>) {
             state.comments = state.comments.filter(comment => comment.id !== action.payload)
+        },
+        resetComments(state) {
+            state.comments = []
+            state.firstLoad = true
+            state.hasMore = true
+            state.page = 1
+            state.previousLink = null
+            state.nextLink = null
+            state.total = null
         }
     },
     extraReducers: (builder) => {
         builder.addCase(listComments.pending, (state) => {
-            state.loading.list = true
+            if (state.firstLoad) {
+                state.loading.list = true
+            }
             state.error.list = null
         })
         builder.addCase(listComments.fulfilled, (state, action: PayloadAction<PaginatedResponse<Comment>>) => {
-            state.comments = action.payload.results
+            state.comments = [...state.comments, ...action.payload.results]
             state.total = action.payload.total
             state.page = action.payload.page
-            state.page_size = action.payload.page_size
             state.nextLink = action.payload.links.next
             state.previousLink = action.payload.links.previous
             state.loading.list = false
             state.error.list = null
+            state.hasMore = !!action.payload.links.next
+            state.firstLoad = false
         })
         builder.addCase(listComments.rejected, (state, action) => {
             state.loading.list = false
@@ -122,4 +136,4 @@ const commentSlice = createSlice({
 })
 
 export default commentSlice.reducer
-export const { deleteCommentSuccess } = commentSlice.actions
+export const {deleteCommentSuccess, resetComments} = commentSlice.actions

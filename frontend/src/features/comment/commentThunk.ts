@@ -2,7 +2,7 @@ import {createAsyncThunk} from "@reduxjs/toolkit";
 import axios from "axios";
 import {ConfigType} from "../../types";
 
-export const listComments = createAsyncThunk('comment/list', async (credentials: { storyId: string }, thunkAPI) => {
+export const listComments = createAsyncThunk('comment/list', async (credentials: { storyId: string, url?: string }, thunkAPI) => {
     const config: ConfigType = {
         headers: {
             'Content-Type': 'application/json',
@@ -14,8 +14,12 @@ export const listComments = createAsyncThunk('comment/list', async (credentials:
         config.headers.Authorization = `JWT ${localStorage.getItem('access')}`
     }
 
+    const requestUrl = credentials.url
+        ? credentials.url
+        : `${process.env.REACT_APP_API_URL}/api/stories/${credentials.storyId}/comments/?page_size=15`
+
     try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/stories/${credentials.storyId}/comments/`, config)
+        const response = await axios.get(requestUrl, config)
         return response.data
     } catch (err: any) {
         return thunkAPI.rejectWithValue(err.message)

@@ -1,7 +1,8 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
 import {listNotifications} from "./notificationThunk";
 import {Loading} from "../../components/Loading";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 interface Props {
     setNotificationsVisible: React.Dispatch<React.SetStateAction<boolean>>
@@ -9,9 +10,10 @@ interface Props {
 
 export const Notifications: React.FC<Props> = ({setNotificationsVisible}) => {
     const dispatch = useAppDispatch()
+    const notificationsContainerRef = useRef(null)
 
     const {isAuthenticated} = useAppSelector(state => state.authentication)
-    const {notifications, loading, error} = useAppSelector(state => state.notification)
+    const {notifications, loading, error, nextLink, hasMore} = useAppSelector(state => state.notification)
 
     useEffect(() => {
         if (isAuthenticated && notifications.length === 0) {
@@ -34,8 +36,16 @@ export const Notifications: React.FC<Props> = ({setNotificationsVisible}) => {
         }
     }, [setNotificationsVisible])
 
+    const fetchMoreData = () => {
+        console.log('fetch more')
+        if (nextLink) {
+            dispatch(listNotifications({url: nextLink}))
+        }
+    }
+
     return (
         <div
+            ref={notificationsContainerRef}
             className="notifications-container fixed bg-gray-800 text-white h-screen z-10 w-3/12 right-0 pt-20 px-3 overflow-y-auto">
             <div className="flex items-center justify-between">
                 <div className="text-xl">Notifications</div>
@@ -52,17 +62,34 @@ export const Notifications: React.FC<Props> = ({setNotificationsVisible}) => {
                     </div>
                 ) : error ? (
                     <div>{error}</div>
-                ) : notifications.map((notification) => (
-                    <div key={notification.id} className="bg-gray-900 p-2 mb-2 rounded-md">
-                        {notification.sender ? (<div className="flex gap-1">
-                            <div>
-                                <img className="rounded-full w-8 h-8" src={`${notification.sender.photo ? notification.sender.photo : require("../../assets/avatar.jpg")}`} alt=""/>
+                ) : notifications.length > 0 && (
+                    <InfiniteScroll
+                        dataLength={notifications.length}
+                        next={fetchMoreData}
+                        hasMore={hasMore}
+                        loader={<Loading/>}
+                        endMessage={
+                            <p className="text-center py-2">
+                                That's all notifications!
+                            </p>
+                        }
+                        scrollableTarget={notificationsContainerRef.current}
+                    >
+                        {notifications.map((notification) => (
+                            <div key={notification.id} className="bg-gray-900 p-2 mb-2 rounded-md">
+                                {notification.sender ? (<div className="flex gap-1">
+                                    <div>
+                                        <img className="rounded-full w-8 h-8"
+                                             src={`${notification.sender.photo ? notification.sender.photo : require("../../assets/avatar.jpg")}`}
+                                             alt=""/>
+                                    </div>
+                                    <div>{notification.sender.username}</div>
+                                </div>) : (<></>)}
+                                <div className="mt-1">{notification.message}</div>
                             </div>
-                            <div>{notification.sender.username}</div>
-                        </div>) : (<></>)}
-                        <div className="mt-1">{notification.message}</div>
-                    </div>
-                ))}
+                        ))}
+                    </InfiniteScroll>
+                )}
             </div>
         </div>
     )
