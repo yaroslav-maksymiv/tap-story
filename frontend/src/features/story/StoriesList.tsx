@@ -15,13 +15,14 @@ export const StoriesList: React.FC = () => {
 
     return (
         <div className="">
-            {loading && <div className="w-full h-full flex justify-center items-center">
-                <Loading/>
-            </div>}
 
             <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
 
-                {stories?.length > 0 && stories.map((story) => (
+                {loading ? (
+                    <div className="w-full h-full flex justify-center items-center">
+                        <Loading/>
+                    </div>
+                ) : stories?.length > 0 && stories.map((story) => (
 
                     <div key={story.id} className="group relative">
                         <div

@@ -33,7 +33,7 @@ class Story(Timestamp):
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='stories')
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='stories')
     image = models.ImageField(upload_to='story_images', blank=True, null=True)
-    likes = models.ManyToManyField(User, related_name='story_like', null=True, blank=True)
+    likes = models.ManyToManyField(User, related_name='stories_liked', null=True, blank=True)
     views = models.ManyToManyField(IpAddress, blank=True, null=True)
     published = models.BooleanField(default=False)
     publish_date = models.DateTimeField(blank=True, null=True)
@@ -77,6 +77,7 @@ class SavedStory(models.Model):
 
     class Meta:
         unique_together = ['user', 'story']
+        ordering = ['-saved_at']
 
     def __str__(self):
         return f'{self.user.username}\'s saved story: {self.story.title}'

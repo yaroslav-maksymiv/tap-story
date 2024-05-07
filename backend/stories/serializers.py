@@ -89,10 +89,7 @@ class CommentSerializer(serializers.ModelSerializer):
 class SavedStorySerializer(serializers.ModelSerializer):
     class Meta:
         model = SavedStory
-        fields = ['user', 'story', 'saved_at']
+        fields = ['user', 'story']
 
     def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        representation['story'] = StorySerializer(instance.story).data
-        return representation
-
+        return StorySerializer(instance.story, context={'request': self.context.get('request')}).data

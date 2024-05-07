@@ -142,6 +142,14 @@ class StoryViewSet(ModelViewSet):
         serializer = CommentSerializer(queryset, many=True, context={'request': request})
         return self.get_paginated_response(serializer.data)
 
+    @action(detail=False, methods=['GET'], permission_classes=[IsAuthenticated], url_path='liked', url_name='liked')
+    def get_liked(self, request):
+        user = request.user
+        queryset = user.stories_liked.all()
+        queryset = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(queryset, many=True)
+        return self.get_paginated_response(serializer.data)
+
 
 class CharacterViewSet(ModelViewSet):
     queryset = Character.objects.all()

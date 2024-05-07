@@ -1,8 +1,10 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {User} from "../authentication/authenticationSlice";
 import {Category} from "../category/categorySlice";
-import {listStories, singleStory, toggleLikeStory} from "./storyThunks";
+import {listLikedStories, listSavedStories, listStories, singleStory, toggleLikeStory} from "./storyThunks";
 import {PaginatedResponse} from "../../types";
+import {savePaginatedResponseToState} from "../../miscellaneous";
+import {Story} from "./Story";
 
 export type Story = {
     id: number
@@ -22,10 +24,10 @@ type StoryState = {
     stories: Story[]
     total: number | null
     page: number
-    page_size: number | null
     nextLink: string | null
     previousLink: string | null
     story: Story | null
+    hasMore: boolean
 }
 
 const initialState: StoryState = {
@@ -33,10 +35,10 @@ const initialState: StoryState = {
     stories: [],
     total: null,
     page: 1,
-    page_size: null,
     nextLink: null,
     previousLink: null,
-    story: null
+    story: null,
+    hasMore: true
 }
 
 const storySlice = createSlice({
@@ -49,12 +51,7 @@ const storySlice = createSlice({
         })
         builder.addCase(listStories.fulfilled, (state, action: PayloadAction<PaginatedResponse<Story>>) => {
             state.stories = action.payload.results
-            state.total = action.payload.total
-            state.page = action.payload.page
-            state.page_size = action.payload.page_size
-            state.nextLink = action.payload.links.next
-            state.previousLink = action.payload.links.previous
-            state.loading = false
+            savePaginatedResponseToState<StoryState, Story>(state, action)
         })
         builder.addCase(listStories.rejected, (state) => {
             state.loading = false
@@ -81,6 +78,20 @@ const storySlice = createSlice({
                     state.story.likes_count--
                 }
             }
+        })
+        builder.addCase(listSavedStories.pending, (state) => {
+            state.loading = true
+        })
+        builder.addCase(listSavedStories.fulfilled, (state, action: PayloadAction<PaginatedResponse<Story>>) => {
+            state.stories = action.payload.results
+            savePaginatedResponseToState<StoryState, Story>(state, action)
+        })
+        builder.addCase(listLikedStories.pending, (state) => {
+            state.loading = true
+        })
+        builder.addCase(listLikedStories.fulfilled, (state, action: PayloadAction<PaginatedResponse<Story>>) => {
+            state.stories = action.payload.results
+            savePaginatedResponseToState<StoryState, Story>(state, action)
         })
     }
 })

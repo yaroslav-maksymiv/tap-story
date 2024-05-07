@@ -2,7 +2,7 @@ import pytest
 
 from ..models import (
     Category, Story, IpAddress,
-    Comment
+    Comment, SavedStory
 )
 
 pytestmark = pytest.mark.django_db
@@ -87,3 +87,14 @@ class TestComment:
 
     def test_user_can_only_like_once(self, comment_factory, user_factory):
         user_can_only_like_once_test(comment_factory, user_factory)
+
+
+class TestSavedStory:
+    def test_create(self, user_factory, story_factory, saved_story_factory):
+        user = user_factory()
+        story = story_factory()
+        saved_story = saved_story_factory(user=user, story=story)
+
+        assert SavedStory.objects.count() == 1
+        assert saved_story.story.pk == story.pk
+        assert saved_story.user == user

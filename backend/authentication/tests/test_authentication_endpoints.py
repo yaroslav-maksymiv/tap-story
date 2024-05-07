@@ -16,4 +16,4 @@ class TestNotificationEndpoints:
 
         response = api_client.get(url, format='json')
         assert response.status_code == 200
-        assert len(json.loads(response.content)) == 1
+        assert len(json.loads(response.content).get('results')) == 1

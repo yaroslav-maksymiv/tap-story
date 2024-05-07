@@ -9,6 +9,7 @@ import {AccountActivation} from "./features/authentication/AccountActivation";
 import {Search} from "./screens/Search";
 import {Story} from "./features/story/Story";
 import {WebSocketComponent} from "./components/WebSocketComponent";
+import {StoriesLibrary} from "./features/story/StoriesLibrary";
 
 const App: React.FC = () => {
     return (
@@ -18,6 +19,7 @@ const App: React.FC = () => {
                 <Routes>
                     <Route path='/' element={<Home/>}/>
                     <Route path='/search' element={<Search/>}/>
+                    <Route path='/library' element={<StoriesLibrary/>}/>
                     <Route path='/story/:id' element={<Story/>}/>
                     <Route path='/login' element={<Login/>}/>
                     <Route path='/register' element={<Register/>}/>

@@ -3,6 +3,8 @@ import json
 
 from django.urls import reverse
 
+from ..models import SavedStory
+
 pytestmark = pytest.mark.django_db
 
 
@@ -200,4 +202,73 @@ class TestStoryEndpoints:
         data = json.loads(response.content)
         assert response.status_code == 200
         assert data.get('liked') == False
+
+    def test_liked_stories(self, user_factory, story_factory, get_jwt_token, api_client):
+        user = user_factory()
+        story = story_factory()
+        token = get_jwt_token(current_user=user)
+        url_toggle_like = reverse('stories-toggle-like', args=[story.pk])
+        url_liked_stories = reverse('stories-liked')
+        api_client.credentials(HTTP_AUTHORIZATION=f'JWT {token}')
+
+        response_toggle_like = api_client.post(url_toggle_like, format='json')
+        assert response_toggle_like.status_code == 200
+
+        response = api_client.get(url_liked_stories, format='json')
+        data = json.loads(response.content)
+        assert response.status_code == 200
+        assert len(data.get('results')) == 1
+        assert data[0].get('id') == story.pk
+
+
+class TestSavedStoryViewSet:
+    def test_create_saved_story(self, user_factory, story_factory, get_jwt_token, api_client):
+        user = user_factory()
+        token = get_jwt_token(current_user=user)
+        story = story_factory()
+        url = reverse('saved-stories-list')
+        data = {'story': story.id}
+        api_client.credentials(HTTP_AUTHORIZATION=f'JWT {token}')
+
+        response = api_client.post(url, data=data, format='json')
+
+        assert response.status_code == 201
+        assert SavedStory.objects.filter(user=user, story=story).exists()
+
+    def test_list_saved_stories(self, user_factory, saved_story_factory, get_jwt_token, api_client):
+        user = user_factory()
+        saved_stories = saved_story_factory.create_batch(3, user=user)
+        token = get_jwt_token(current_user=user)
+        url = reverse('saved-stories-list')
+        api_client.credentials(HTTP_AUTHORIZATION=f'JWT {token}')
+
+        response = api_client.get(url)
+        data = json.loads(response.content)
+        assert response.status_code == 200
+        assert len(data.get('results')) == 3
+
+    def test_delete_saved_story(self, user_factory, saved_story_factory, get_jwt_token, api_client):
+        user = user_factory()
+        saved_story = saved_story_factory(user=user)
+        token = get_jwt_token(current_user=user)
+        url = reverse('saved-stories-detail', args=[saved_story.pk])
+        api_client.credentials(HTTP_AUTHORIZATION=f'JWT {token}')
+
+        response = api_client.delete(url)
+
+        assert response.status_code == 204
+        assert not SavedStory.objects.filter(pk=saved_story.pk).exists()
+
+    def test_delete_saved_story_forbidden(self, user_factory, saved_story_factory, get_jwt_token, api_client):
+        user = user_factory()
+        other_user = user_factory()
+        saved_story = saved_story_factory(user=other_user)
+        token = get_jwt_token(current_user=user)
+        url = reverse('saved-stories-detail', args=[saved_story.pk])
+        api_client.credentials(HTTP_AUTHORIZATION=f'JWT {token}')
+
+        response = api_client.delete(url)
+
+        assert response.status_code == 403
+        assert SavedStory.objects.filter(pk=saved_story.pk).exists()
 
