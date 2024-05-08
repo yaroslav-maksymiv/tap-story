@@ -88,3 +88,45 @@ export const listLikedStories = createAsyncThunk('story/liked', async (credentia
         return thunkAPI.rejectWithValue(err.message)
     }
 })
+
+export const saveStory = createAsyncThunk('story/save', async (credentials: {storyId: number}, thunkAPI) => {
+    const config = {
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `JWT ${localStorage.getItem('access')}`
+        }
+    }
+
+    const data = {
+        story: credentials.storyId
+    }
+
+    try {
+        const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/saved-stories/`, data, config)
+        return response.data
+    } catch (err: any) {
+        return thunkAPI.rejectWithValue(err.message)
+    }
+})
+
+export const removeFromSaved = createAsyncThunk('story/removeSaved', async (credentials: {storyId: number}, thunkAPI) => {
+    const config = {
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `JWT ${localStorage.getItem('access')}`
+        }
+    }
+
+    const data = {
+        story: credentials.storyId
+    }
+
+    try {
+        const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/saved-stories/delete/`, {data: data, headers: config.headers})
+        return response.data
+    } catch (err: any) {
+        return thunkAPI.rejectWithValue(err.message)
+    }
+})

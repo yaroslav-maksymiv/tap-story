@@ -19,10 +19,14 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class StorySerializer(serializers.ModelSerializer):
     is_liked = serializers.SerializerMethodField(read_only=True)
+    is_saved = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Story
-        fields = ['id', 'title', 'description', 'author', 'category', 'image', 'is_liked']
+        fields = [
+            'id', 'title', 'description', 'author',
+            'category', 'image', 'is_liked', 'is_saved'
+        ]
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -48,6 +52,15 @@ class StorySerializer(serializers.ModelSerializer):
             if user.is_authenticated:
                 if user in obj.likes.all():
                     return True
+            return False
+        return False
+
+    def get_is_saved(self, obj):
+        request = self.context.get('request')
+        if request:
+            user = request.user
+            if user.is_authenticated and SavedStory.objects.filter(user=user, story=obj).exists():
+                return True
             return False
         return False
 

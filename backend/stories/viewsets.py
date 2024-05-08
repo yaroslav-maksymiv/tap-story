@@ -279,10 +279,18 @@ class SavedStoryViewSet(ModelViewSet):
             return self.get_paginated_response(serializer.data)
         return Response(serializer.data)
 
-    def destroy(self, request, pk=None, *args, **kwargs):
-        instance = self.get_object()
+    @action(detail=False, methods=['DELETE'], permission_classes=[IsAuthenticated], url_name='delete')
+    def delete(self, request):
         user = request.user
-        if instance.user == user:
-            instance.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response(status=status.HTTP_403_FORBIDDEN)
+        story = get_object_or_404(Story, pk=request.data.get('story'))
+        instance = get_object_or_404(SavedStory, user=user, story=story)
+        instance.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    # def destroy(self, request, pk=None, *args, **kwargs):
+    #     user = request.user
+    #     story = get_object_or_404(Story, pk=pk)
+    #     instance = get_object_or_404(SavedStory, user=user, story=story)
+    #     instance.delete()
+    #     return Response(status=status.HTTP_204_NO_CONTENT)
+

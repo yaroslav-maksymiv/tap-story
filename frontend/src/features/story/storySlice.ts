@@ -17,6 +17,7 @@ export type Story = {
     comments_count: number
     views: number
     is_liked: boolean
+    is_saved: boolean
 }
 
 type StoryState = {
