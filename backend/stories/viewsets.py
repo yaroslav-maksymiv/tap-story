@@ -9,11 +9,13 @@ from datetime import datetime
 
 from .models import (
     Category, Story, Character,
-    Comment, IpAddress, SavedStory
+    Comment, IpAddress, SavedStory,
+    Episode, Message
 )
 from .serializers import (
-    StorySerializer, CategorySerializer, CommentSerializer,
-    CharacterSerializer, SavedStorySerializer
+    StorySerializer, CommentSerializer,
+    CharacterSerializer, SavedStorySerializer, EpisodeSerializer,
+    MessageSerializer
 )
 from .pagination import MyPagePagination
 from authentication.serializers import (
@@ -30,6 +32,17 @@ def get_client_ip(request):
     else:
         ip = request.META.get('REMOTE_ADDR')
     return ip
+
+
+def destroy_by_story_pk(pk, user, queryset):
+    instance = get_object_or_404(queryset, pk=pk)
+    story = Story.objects.get(pk=instance.story.id)
+    if story.author == user:
+        instance.delete()
+        # 204 response
+        return True
+    # forbidden 403 error
+    return False
 
 
 class StoryViewSet(ModelViewSet):
@@ -134,6 +147,13 @@ class StoryViewSet(ModelViewSet):
             return Response(serializer.data)
         return Response(status=status.HTTP_403_FORBIDDEN)
 
+    @action(detail=True, methods=['GET'], url_path='episodes', url_name='episodes')
+    def get_episodes(self, request, pk=None):
+        story = get_object_or_404(Story, pk=pk)
+        queryset = story.episodes.all()
+        serializer = EpisodeSerializer(queryset, many=True)
+        return Response(serializer.data)
+
     @action(detail=True, methods=['GET'], url_path='comments', url_name='comments')
     def get_comments(self, request, pk=None):
         story = get_object_or_404(Story, pk=pk)
@@ -184,10 +204,7 @@ class CharacterViewSet(ModelViewSet):
         return Response(status=status.HTTP_403_FORBIDDEN)
 
     def destroy(self, request, pk=None, *args, **kwargs):
-        instance = get_object_or_404(self.queryset, pk=pk)
-        story = Story.objects.get(pk=instance.story.id)
-        if story.author == request.user:
-            instance.delete()
+        if destroy_by_story_pk(pk, request.user, self.get_queryset()):
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_403_FORBIDDEN)
 
@@ -294,3 +311,33 @@ class SavedStoryViewSet(ModelViewSet):
     #     instance.delete()
     #     return Response(status=status.HTTP_204_NO_CONTENT)
 
+
+class EpisodeViewSet(ModelViewSet):
+    queryset = Episode.objects.all()
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    serializer_class = EpisodeSerializer
+
+    def create(self, request, *args, **kwargs):
+        story = get_object_or_404(Story, pk=request.data.get('story'))
+        if story.author == request.user:
+            episode_data = {
+                'title': request.data.get('title'),
+                'story': story.id
+            }
+            serializer = self.get_serializer(data=episode_data)
+            if serializer.is_valid():
+                character = serializer.save()
+                return Response(self.get_serializer(character).data, status=status.HTTP_201_CREATED)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_403_FORBIDDEN)
+
+    def destroy(self, request, pk=None, *args, **kwargs):
+        if destroy_by_story_pk(pk, request.user, self.get_queryset()):
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_403_FORBIDDEN)
+
+
+class MessageViewSet(ModelViewSet):
+    queryset = Message.objects.all()
+    permission_classes = [IsAuthenticated]
+    serializer_class = MessageSerializer

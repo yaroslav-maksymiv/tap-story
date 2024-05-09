@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {useAppDispatch, useAppSelector} from '../../app/hooks'
 import {login} from "./authenticationThunks";
-import {Link, useNavigate} from "react-router-dom";
+import {Link, useLocation, useNavigate} from "react-router-dom";
 import {ErrorAlert} from "../../components/ErrorAlert";
 
 type FormData = {
@@ -10,6 +10,7 @@ type FormData = {
 }
 
 export const Login: React.FC = () => {
+    const location = useLocation()
     const dispatch = useAppDispatch()
     const navigate = useNavigate()
 
@@ -33,9 +34,15 @@ export const Login: React.FC = () => {
         setFormData({email: '', password: ''})
     }
 
+    const redirectUrl = new URLSearchParams(location.search).get('redirect')
+
     useEffect(() => {
         if (isAuthenticated) {
-            navigate('/')
+            if (redirectUrl) {
+                navigate(`/${redirectUrl}`)
+            } else {
+                navigate('/')
+            }
         }
     }, [isAuthenticated, navigate])
 

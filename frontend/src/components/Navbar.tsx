@@ -12,12 +12,30 @@ export const Navbar: React.FC = () => {
     const {notificationsCount} = useAppSelector(state => state.notification)
 
     const [notificationsVisible, setNotificationsVisible] = useState<boolean>(false)
+    const [menuVisible, setMenuVisible] = useState<boolean>(false)
 
     useEffect(() => {
         if (notificationsVisible) {
             dispatch(resetNotificationsCount())
         }
     }, [notificationsVisible, notificationsCount])
+
+    useEffect(() => {
+        if (menuVisible) {
+            const handleClickOutside = (event: MouseEvent) => {
+                const target = event.target as HTMLElement
+                if (!target.closest('.menu') && !target.closest('.menu-activate')) {
+                    setMenuVisible(false)
+                }
+            }
+
+            document.addEventListener('click', handleClickOutside)
+
+            return () => {
+                document.removeEventListener('click', handleClickOutside)
+            }
+        }
+    }, [setMenuVisible, menuVisible])
 
     const handleLogout = () => {
         dispatch(logout())
@@ -41,6 +59,17 @@ export const Navbar: React.FC = () => {
                     </Link>
                     <div className="flex items-center lg:order-2 relative">
                         {isAuthenticated ? (<>
+                            <div
+                                className="mr-4 text-white text-sm bg-gray-800 rounded-md px-2 py-1 cursor-pointer flex items-center gap-1.5">
+                                Create
+                                <Link to={'/create'}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                         stroke-width="1.5" stroke="currentColor" className="w-5 h-5">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                              d="M12 4.5v15m7.5-7.5h-15"/>
+                                    </svg>
+                                </Link>
+                            </div>
                             <div className="mr-4 text-white cursor-pointer">
                                 <Link to={'/library'}>
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -59,13 +88,22 @@ export const Navbar: React.FC = () => {
                                           d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"/>
                                 </svg>
                             </div>
-                            {user?.photo ? (<Link to={'/'}>
-                                <img src={require("../assets/avatar.jpg")} className="w-10 h-10 rounded-full"
-                                     alt="Avatar"/>
-                            </Link>) : (<Link to={'/'}>
-                                <img src={require("../assets/avatar.jpg")} className="w-10 h-10 rounded-full"
-                                     alt="Avatar"/>
-                            </Link>)}
+                            <div className="relative">
+                                <div onClick={() => setMenuVisible(prevState => !prevState)} className="menu-activate">
+                                    {user?.photo ? (
+                                        <img src={require("../assets/avatar.jpg")} className="w-10 h-10 rounded-full"
+                                             alt="Avatar"/>
+                                    ) : (
+                                        <img src={require("../assets/avatar.jpg")} className="w-10 h-10 rounded-full"
+                                             alt="Avatar"/>
+                                    )}
+                                </div>
+                                {menuVisible && (
+                                    <div className="menu text-white w-52 absolute top-14 right-0 bg-gray-800 px-2 py-3 rounded-md flex flex-col gap-2">
+                                        <div className="hover:bg-gray-700 px-1 rounded-md"><Link to={'/profile'}>Profile</Link></div>
+                                    </div>
+                                )}
+                            </div>
                             <div onClick={handleLogout}
                                  className="text-gray-800 dark:text-white hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 ml-2 dark:hover:bg-gray-700 focus:outline-none dark:focus:ring-gray-800 cursor-pointer">Logout
                             </div>

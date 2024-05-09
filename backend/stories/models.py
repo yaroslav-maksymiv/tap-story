@@ -86,7 +86,6 @@ class SavedStory(models.Model):
 class Episode(Timestamp):
     title = models.CharField(max_length=255)
     story = models.ForeignKey(Story, related_name='episodes', on_delete=models.CASCADE)
-    order = models.FloatField()
 
     def __str__(self):
         return f'Episode {self.order}: {self.title}'

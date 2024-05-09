@@ -4,7 +4,9 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 from .models import (
-    Category, Story, Character, Comment, SavedStory
+    Category, Story, Character,
+    Comment, SavedStory, Episode,
+    Message
 )
 from authentication.serializers import (
     UserAccountSerializer
@@ -106,3 +108,19 @@ class SavedStorySerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         return StorySerializer(instance.story, context={'request': self.context.get('request')}).data
+
+
+class EpisodeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Episode
+        fields = ['id', 'title', 'story']
+
+
+class MessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Message
+        fields = [
+            'id', 'message_type', 'order', 'character', 'episode',
+            'text_content', 'image_content', 'video_content', 'audio_content',
+            'status_content'
+        ]

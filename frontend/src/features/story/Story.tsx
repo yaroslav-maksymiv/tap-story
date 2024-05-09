@@ -34,7 +34,9 @@ export const Story: React.FC = () => {
         if (isAuthenticated) {
             dispatch(toggleLikeStory({id}))
         } else {
-            navigate('/login')
+            if (story) {
+                navigate(`/login?redirect=story/${story.id}`)
+            }
         }
     }
 
@@ -50,7 +52,9 @@ export const Story: React.FC = () => {
                 })
             }
         } else {
-            navigate('/login')
+            if (story) {
+                navigate(`/login?redirect=story/${story.id}`)
+            }
         }
     }
 
