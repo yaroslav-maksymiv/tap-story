@@ -2,7 +2,8 @@ import pytest
 
 from ..models import (
     Category, Story, IpAddress,
-    Comment, SavedStory
+    Comment, SavedStory, Character,
+    Episode, Message
 )
 
 pytestmark = pytest.mark.django_db
@@ -98,3 +99,13 @@ class TestSavedStory:
         assert SavedStory.objects.count() == 1
         assert saved_story.story.pk == story.pk
         assert saved_story.user == user
+
+
+class TestCharacter:
+    def test_create(self, story_factory, character_factory):
+        story = story_factory()
+        character_factory.create_batch(5, story=story)
+
+        assert Character.objects.count() == 5
+        assert Character.objects.first().story == story
+

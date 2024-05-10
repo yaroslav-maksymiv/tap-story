@@ -5,7 +5,8 @@ from django.utils import timezone
 
 from stories.models import (
     Category, Story, SavedStory,
-    Comment, Character, IpAddress
+    Comment, Character, IpAddress,
+    Episode, Message
 )
 from authentication.models import (
     Notification
@@ -121,4 +122,26 @@ class NotificationFactory(factory.django.DjangoModelFactory):
     message = 'notification message text'
     is_read = False
     created_at = factory.LazyFunction(timezone.now)
-    
+
+
+class EpisodeFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Episode
+
+    title = factory.Sequence(lambda n: f'Episode title {n}')
+    story = factory.SubFactory(StoryFactory)
+
+
+class MessageFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Message
+
+    episode = factory.SubFactory(EpisodeFactory)
+    character = factory.SubFactory(CharacterFactory)
+    order = factory.Sequence(lambda n: 1024 * n)
+    message_type = 'text'
+    text_content = factory.Faker('text', max_nb_chars=200)
+    image_content = factory.django.ImageField(filename='test_image.jpg')
+    video_content = factory.django.FileField(filename='test_video.mp4')
+    audio_content = factory.django.FileField(filename='test_audio.mp3')
+    status_content = factory.Faker('sentence', nb_words=6)

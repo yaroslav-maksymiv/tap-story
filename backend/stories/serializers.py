@@ -124,3 +124,20 @@ class MessageSerializer(serializers.ModelSerializer):
             'text_content', 'image_content', 'video_content', 'audio_content',
             'status_content'
         ]
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        request = self.context.get('request')
+
+        if instance.character:
+            representation['character'] = CharacterSerializer(instance.character).data
+
+        if request:
+            if instance.image_content:
+                representation['image_content'] = request.build_absolute_uri(instance.image_content.url)
+            if instance.video_content:
+                representation['video_content'] = request.build_absolute_uri(instance.video_content.url)
+            if instance.audio_content:
+                representation['audio_content'] = request.build_absolute_uri(instance.audio_content.url)
+
+        return representation

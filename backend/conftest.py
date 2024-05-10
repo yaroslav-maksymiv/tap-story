@@ -6,7 +6,8 @@ from django.shortcuts import reverse
 from factories import (
     CategoryFactory, StoryFactory, UserFactory,
     IpAddressFactory, CommentFactory, CharacterFactory,
-    SavedStoryFactory, NotificationFactory
+    SavedStoryFactory, NotificationFactory, EpisodeFactory,
+    MessageFactory
 )
 
 register(CategoryFactory)
@@ -17,6 +18,8 @@ register(CommentFactory)
 register(CharacterFactory)
 register(SavedStoryFactory)
 register(NotificationFactory)
+register(EpisodeFactory)
+register(MessageFactory)
 
 
 @pytest.fixture

@@ -119,6 +119,9 @@ class Message(Timestamp):
     audio_content = models.FileField(upload_to='message_audios', blank=True, null=True)
     status_content = models.CharField(max_length=255, blank=True, null=True)
 
+    class Meta:
+        ordering = ['order']
+
     def __str__(self):
         return f'{self.character.name} - {self.message_type}'
 
