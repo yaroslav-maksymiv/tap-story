@@ -109,3 +109,40 @@ class TestCharacter:
         assert Character.objects.count() == 5
         assert Character.objects.first().story == story
 
+
+class TestEpisode:
+    def test_create(self, story_factory, episode_factory):
+        story = story_factory()
+        episode = episode_factory(title='Episode title', story=story)
+
+        assert Episode.objects.count() == 1
+        assert episode.title.startswith('Episode')
+
+
+class TestMessage:
+    def test_create(self, episode_factory, character_factory, message_factory):
+        episode = episode_factory()
+        character = character_factory()
+        message = message_factory(
+            episode=episode,
+            character=character,
+            order=1024,
+            message_type='text',
+            text_content='Some text'
+        )
+
+        assert Message.objects.count() == 1
+        assert message.episode == episode
+        assert message.character == character
+        assert message.order == 1024
+        assert message.message_type == 'text'
+        assert message.text_content == 'Some text'
+
+    def test_set_null_character_on_delete(self, character_factory, message_factory):
+        character = character_factory()
+        message = message_factory(character=character)
+
+        assert message.character == character
+        character.delete()
+        message.refresh_from_db()
+        assert message.character is None

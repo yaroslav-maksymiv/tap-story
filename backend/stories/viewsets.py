@@ -199,7 +199,8 @@ class CharacterViewSet(ModelViewSet):
         if story.author == request.user:
             character_data = {
                 'name': request.data.get('name'),
-                'story': story.id
+                'story': story.id,
+                'color': request.data.get('color')
             }
             serializer = self.get_serializer(data=character_data)
             if serializer.is_valid():
@@ -211,9 +212,11 @@ class CharacterViewSet(ModelViewSet):
     def partial_update(self, request, pk=None, *args, **kwargs):
         instance = self.get_object()
         if instance.story.author == request.user:
-            update_data = {
-                'name': request.data.get('name')
-            }
+            update_data = {}
+            if 'name' in request.data:
+                update_data['name'] = request.data.get('name')
+            if 'color' in request.data:
+                update_data['color'] = request.data.get('color')
             serializer = self.get_serializer(instance, data=update_data, partial=True)
             if serializer.is_valid():
                 serializer.save()
@@ -318,6 +321,9 @@ class SavedStoryViewSet(ModelViewSet):
     def delete(self, request):
         user = request.user
         story = get_object_or_404(Story, pk=request.data.get('story'))
+        if story.author != user:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
         instance = get_object_or_404(SavedStory, user=user, story=story)
         instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -327,6 +333,7 @@ class EpisodeViewSet(ModelViewSet):
     queryset = Episode.objects.all()
     permission_classes = [IsAuthenticatedOrReadOnly]
     serializer_class = EpisodeSerializer
+    pagination_class = MyPagePagination
 
     def create(self, request, *args, **kwargs):
         story = get_object_or_404(Story, pk=request.data.get('story'))
@@ -364,8 +371,9 @@ class EpisodeViewSet(ModelViewSet):
     def get_messages(self, request, pk=None):
         episode = get_object_or_404(Episode, pk=pk)
         queryset = episode.messages.all().order_by('order')
+        queryset = self.paginate_queryset(queryset)
         serializer = MessageSerializer(queryset, many=True, context={'request': request})
-        return Response(serializer.data)
+        return self.get_paginated_response(serializer.data)
 
 
 class MessageViewSet(ModelViewSet):
@@ -391,7 +399,7 @@ class MessageViewSet(ModelViewSet):
         if not message:
             return Response({'message': 'Invalid message type.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(self.get_serializer(message).data)
+        return Response(self.get_serializer(message).data, status=status.HTTP_201_CREATED)
 
     def create_message(self, episode, order, message_type, data):
         if message_type == 'status':

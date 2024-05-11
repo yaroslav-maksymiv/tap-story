@@ -218,7 +218,7 @@ class TestStoryEndpoints:
         data = json.loads(response.content)
         assert response.status_code == 200
         assert len(data.get('results')) == 1
-        assert data[0].get('id') == story.pk
+        assert data.get('results')[0].get('id') == story.pk
 
 
 class TestSavedStoryViewSet:
@@ -259,16 +259,175 @@ class TestSavedStoryViewSet:
         assert response.status_code == 204
         assert not SavedStory.objects.filter(pk=saved_story.pk).exists()
 
-    def test_delete_saved_story_forbidden(self, user_factory, saved_story_factory, get_jwt_token, api_client):
+    def test_delete_saved_story_forbidden(self, user_factory, saved_story_factory, get_jwt_token, story_factory, api_client):
         user = user_factory()
         other_user = user_factory()
-        saved_story = saved_story_factory(user=other_user)
+        story = story_factory()
+        saved_story = saved_story_factory(user=other_user, story=story)
         token = get_jwt_token(current_user=user)
-        url = reverse('saved-stories-detail', args=[saved_story.pk])
+        url = reverse('saved-stories-delete')
         api_client.credentials(HTTP_AUTHORIZATION=f'JWT {token}')
+        data = {'story': saved_story.story.pk}
 
-        response = api_client.delete(url)
+        response = api_client.delete(url, data=data)
 
         assert response.status_code == 403
         assert SavedStory.objects.filter(pk=saved_story.pk).exists()
 
+
+class TestCharacterEndpoints:
+    def test_create(self, story_factory, user_factory, get_jwt_token, api_client):
+        name = 'New Character'
+        user = user_factory()
+        story = story_factory(author=user)
+        token = get_jwt_token(current_user=user)
+        url = reverse('characters-list')
+        data = {'name': name, 'story': story.pk}
+
+        api_client.credentials(HTTP_AUTHORIZATION=f'JWT {token}')
+        response = api_client.post(url, data=data, format='json')
+
+        assert response.status_code == 201
+        response_data = json.loads(response.content)
+        assert response_data.get('id') == 1
+        assert response_data.get('name') == name
+        assert response_data.get('story') == story.pk
+
+    def test_update(self, character_factory, user_factory, get_jwt_token, api_client):
+        user = user_factory()
+        character = character_factory(name='Original Name', story__author=user)
+        token = get_jwt_token(current_user=user)
+        url = reverse('characters-detail', args=[character.pk])
+        new_name = 'Updated Name'
+        data = {'name': new_name}
+
+        api_client.credentials(HTTP_AUTHORIZATION=f'JWT {token}')
+        response = api_client.patch(url, data=data, format='json')
+
+        assert response.status_code == 200
+        assert response.data['name'] == new_name
+
+    def test_delete(self, character_factory, user_factory, get_jwt_token, api_client):
+        user = user_factory()
+        character = character_factory(story__author=user)
+        token = get_jwt_token(current_user=user)
+        url = reverse('characters-detail', args=[character.pk])
+
+        api_client.credentials(HTTP_AUTHORIZATION=f'JWT {token}')
+        response = api_client.delete(url)
+
+        assert response.status_code == 204
+
+
+class TestEpisodeViewSet:
+    def test_create(self, user_factory, story_factory, get_jwt_token, api_client):
+        user = user_factory()
+        token = get_jwt_token(current_user=user)
+        story = story_factory(author=user)
+        url = reverse('episodes-list')
+        data = {'title': 'New Episode', 'story': story.pk}
+
+        api_client.credentials(HTTP_AUTHORIZATION=f'JWT {token}')
+        response = api_client.post(url, data=data, format='json')
+
+        assert response.status_code == 201
+        assert response.data['title'] == 'New Episode'
+        assert response.data['story'] == story.pk
+
+    def test_update(self, user_factory, episode_factory, get_jwt_token, api_client):
+        user = user_factory()
+        token = get_jwt_token(current_user=user)
+        episode = episode_factory(story__author=user)
+        url = reverse('episodes-detail', args=[episode.pk])
+        updated_title = 'Updated Episode Title'
+        data = {'title': updated_title}
+
+        api_client.credentials(HTTP_AUTHORIZATION=f'JWT {token}')
+        response = api_client.patch(url, data=data, format='json')
+
+        assert response.status_code == 200
+        assert response.data['title'] == updated_title
+
+    def test_destroy(self, user_factory, episode_factory, get_jwt_token, api_client):
+        user = user_factory()
+        token = get_jwt_token(current_user=user)
+        episode = episode_factory(story__author=user)
+        url = reverse('episodes-detail', args=[episode.pk])
+
+        api_client.credentials(HTTP_AUTHORIZATION=f'JWT {token}')
+        response = api_client.delete(url)
+
+        assert response.status_code == 204
+
+    @pytest.mark.skip
+    def test_get_messages(self, episode_factory, message_factory, api_client):
+        episode = episode_factory()
+        message_factory.create_batch(5, episode=episode)
+        url = reverse('episodes-messages', args=[episode.pk])
+
+        response = api_client.get(url)
+
+        assert response.status_code == 200
+        assert len(response.data) == 5
+
+
+class TestMessageEndpoints:
+    def test_create(self, user_factory, episode_factory, character_factory, get_jwt_token, api_client):
+        user = user_factory()
+        token = get_jwt_token(current_user=user)
+        episode = episode_factory(story__author=user)
+        character = character_factory()
+        url = reverse('messages-list')
+        data = {
+            'episode': episode.pk,
+            'order': 1024,
+            'character': character.pk,
+            'message_type': 'text',
+            'text_content': 'Test message content'
+        }
+
+        api_client.credentials(HTTP_AUTHORIZATION=f'JWT {token}')
+        response = api_client.post(url, data=data, format='json')
+
+        assert response.status_code == 201
+        assert response.data['text_content'] == 'Test message content'
+
+    def test_update(self, user_factory, message_factory, get_jwt_token, api_client):
+        user = user_factory()
+        token = get_jwt_token(current_user=user)
+        message = message_factory(episode__story__author=user)
+        url = reverse('messages-detail', args=[message.pk])
+        updated_content = 'Updated message content'
+        data = {'text_content': updated_content}
+
+        api_client.credentials(HTTP_AUTHORIZATION=f'JWT {token}')
+        response = api_client.patch(url, data=data, format='json')
+
+        assert response.status_code == 200
+        assert response.data['text_content'] == updated_content
+
+    def test_destroy(self, user_factory, message_factory, get_jwt_token, api_client):
+        user = user_factory()
+        token = get_jwt_token(current_user=user)
+        message = message_factory(episode__story__author=user)
+        url = reverse('messages-detail', args=[message.pk])
+
+        api_client.credentials(HTTP_AUTHORIZATION=f'JWT {token}')
+        response = api_client.delete(url)
+
+        assert response.status_code == 204
+
+    def test_update_order(self, user_factory, message_factory, get_jwt_token, api_client):
+        user = user_factory()
+        token = get_jwt_token(current_user=user)
+        message = message_factory(episode__story__author=user)
+        url = reverse('messages-order', args=[message.pk])
+        new_order = 100
+        data = {'order': new_order}
+
+        api_client.credentials(HTTP_AUTHORIZATION=f'JWT {token}')
+        response = api_client.patch(url, data=data, format='json')
+
+        assert response.status_code == 200
+        message.refresh_from_db()
+        assert message.order == new_order

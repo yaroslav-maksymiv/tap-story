@@ -70,7 +70,7 @@ class StorySerializer(serializers.ModelSerializer):
 class CharacterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Character
-        fields = ['id', 'name', 'story']
+        fields = ['id', 'name', 'story', 'color']
 
 
 class CommentSerializer(serializers.ModelSerializer):
