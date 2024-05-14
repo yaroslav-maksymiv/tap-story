@@ -130,3 +130,30 @@ export const removeFromSaved = createAsyncThunk('story/removeSaved', async (cred
         return thunkAPI.rejectWithValue(err.message)
     }
 })
+
+export const createStory = createAsyncThunk('story/create', async (credentials: {
+    title: string, description: string, category: string, image: File | null
+}, thunkAPI) => {
+    const config = {
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `JWT ${localStorage.getItem('access')}`
+        }
+    }
+
+    const data = new FormData()
+    data.append('title', credentials.title)
+    data.append('description', credentials.description)
+    data.append('category', credentials.category)
+    if (credentials.image) {
+        data.append('image', credentials.image)
+    }
+
+    try {
+        const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/stories/`, data, config)
+        return response.data
+    } catch (err: any) {
+        return thunkAPI.rejectWithValue(err.message)
+    }
+})

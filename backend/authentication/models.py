@@ -40,6 +40,9 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 
+    def get_count_unread_notifications(self):
+        return self.notifications.filter(is_read=False)
+
     def __str__(self):
         return self.username
 

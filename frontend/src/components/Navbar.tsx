@@ -59,17 +59,17 @@ export const Navbar: React.FC = () => {
                     </Link>
                     <div className="flex items-center lg:order-2 relative">
                         {isAuthenticated ? (<>
-                            <div
-                                className="mr-4 text-white text-sm bg-gray-800 rounded-md px-2 py-1 cursor-pointer flex items-center gap-1.5">
-                                Create
-                                <Link to={'/create'}>
+                            <Link to={'story/create'}>
+                                <div
+                                    className="mr-4 text-white text-sm bg-gray-800 rounded-md px-2 py-1 cursor-pointer flex items-center gap-1.5">
+                                    Create
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                          stroke-width="1.5" stroke="currentColor" className="w-5 h-5">
                                         <path stroke-linecap="round" stroke-linejoin="round"
                                               d="M12 4.5v15m7.5-7.5h-15"/>
                                     </svg>
-                                </Link>
-                            </div>
+                                </div>
+                            </Link>
                             <div className="mr-4 text-white cursor-pointer">
                                 <Link to={'/library'}>
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -99,8 +99,14 @@ export const Navbar: React.FC = () => {
                                     )}
                                 </div>
                                 {menuVisible && (
-                                    <div className="menu text-white w-52 absolute top-14 right-0 bg-gray-800 px-2 py-3 rounded-md flex flex-col gap-2">
-                                        <div className="hover:bg-gray-700 px-1 rounded-md"><Link to={'/profile'}>Profile</Link></div>
+                                    <div
+                                        className="menu text-white w-52 absolute top-14 right-0 bg-gray-800 px-2 py-3 rounded-md flex flex-col gap-2">
+                                        <Link to={'/profile'}>
+                                            <div className="hover:bg-gray-700 px-1 rounded-md">Profile</div>
+                                        </Link>
+                                        <Link to={'/story/my'}>
+                                            <div className="hover:bg-gray-700 px-1 rounded-md">My Stories</div>
+                                        </Link>
                                     </div>
                                 )}
                             </div>
