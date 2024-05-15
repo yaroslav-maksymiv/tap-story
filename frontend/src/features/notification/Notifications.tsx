@@ -37,7 +37,6 @@ export const Notifications: React.FC<Props> = ({setNotificationsVisible}) => {
     }, [setNotificationsVisible])
 
     const fetchMoreData = () => {
-        console.log('fetch more')
         if (nextLink) {
             dispatch(listNotifications({url: nextLink}))
         }

@@ -3,6 +3,7 @@ import {Link} from "react-router-dom";
 import {useAppDispatch, useAppSelector} from "../app/hooks";
 import {logout} from "../features/authentication/authenticationSlice";
 import {Notifications} from "../features/notification/Notifications";
+import {countUnreadNotifications} from "../features/notification/notificationThunk";
 import {resetNotificationsCount} from "../features/notification/notificationSlice";
 
 export const Navbar: React.FC = () => {
@@ -36,6 +37,10 @@ export const Navbar: React.FC = () => {
             }
         }
     }, [setMenuVisible, menuVisible])
+
+    useEffect(() => {
+        dispatch(countUnreadNotifications({}))
+    }, [])
 
     const handleLogout = () => {
         dispatch(logout())
@@ -81,7 +86,7 @@ export const Navbar: React.FC = () => {
                             </div>
                             <div onClick={() => setNotificationsVisible(prev => !prev)}
                                  className="notifications-open flex gap-1 items-center mr-4 text-white cursor-pointer">
-                                {notificationsCount > 0 && <div>{notificationsCount}</div>}
+                                {notificationsCount > 0 &&  (notificationsCount > 10 ? <div>9+</div> : <div>{notificationsCount}</div>)}
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                      stroke-width="1.5" stroke="currentColor" className="w-5 h-5">
                                     <path stroke-linecap="round" stroke-linejoin="round"
