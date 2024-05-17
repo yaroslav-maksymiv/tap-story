@@ -1,7 +1,14 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {User} from "../authentication/authenticationSlice";
 import {Category} from "../category/categorySlice";
-import {listLikedStories, listSavedStories, listStories, singleStory, toggleLikeStory} from "./storyThunks";
+import {
+    listLikedStories,
+    listMyStories,
+    listSavedStories,
+    listStories,
+    singleStory,
+    toggleLikeStory
+} from "./storyThunks";
 import {PaginatedResponse} from "../../types";
 import {savePaginatedResponseToState} from "../../miscellaneous";
 import {Story} from "./Story";
@@ -93,6 +100,17 @@ const storySlice = createSlice({
         builder.addCase(listLikedStories.fulfilled, (state, action: PayloadAction<PaginatedResponse<Story>>) => {
             state.stories = action.payload.results
             savePaginatedResponseToState<StoryState, Story>(state, action)
+        })
+        builder.addCase(listMyStories.pending, (state) => {
+            state.loading = true
+        })
+        builder.addCase(listMyStories.fulfilled, (state, action: PayloadAction<PaginatedResponse<Story>>) => {
+            state.stories = action.payload.results
+            savePaginatedResponseToState<StoryState, Story>(state, action)
+        })
+        builder.addCase(listMyStories.rejected, (state) => {
+            state.loading = false
+            state.stories = []
         })
     }
 })

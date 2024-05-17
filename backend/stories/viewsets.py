@@ -74,8 +74,9 @@ class StoryViewSet(ModelViewSet):
     ordering_fields = ['created_at', 'views']
 
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.queryset)
-        self.paginate_queryset(queryset)
+        queryset = self.queryset
+        # queryset = self.filter_queryset(self.queryset)
+        queryset = self.paginate_queryset(queryset)
         serializer = self.get_serializer(queryset, many=True)
         return self.get_paginated_response(serializer.data)
 
@@ -121,8 +122,11 @@ class StoryViewSet(ModelViewSet):
                 'description': request.data.get('description'),
                 'author': request.user.id,
                 'category': category.id,
-                'image': request.FILES.get('image')
             }
+
+            image = request.FILES.get('image')
+            if image:
+                update_data['image'] = request.FILES.get('image')
 
             serializer = self.get_serializer(story, data=update_data)
 
@@ -131,6 +135,13 @@ class StoryViewSet(ModelViewSet):
                 return Response(self.get_serializer(updated_story).data, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_403_FORBIDDEN)
+
+    @action(detail=False, methods=['GET'], permission_classes=[IsAuthenticated], url_path='my', url_name='my')
+    def get_my_stories(self, request, pk=None):
+        queryset = self.queryset.filter(author=request.user)
+        queryset = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(queryset, many=True, context={'request': request})
+        return self.get_paginated_response(serializer.data)
 
     @action(detail=True, methods=['POST'], url_path='publish', url_name='publish')
     def publish_story(self, request, pk=None):
@@ -311,11 +322,9 @@ class SavedStoryViewSet(ModelViewSet):
     def list(self, request, *args, **kwargs):
         user = request.user
         queryset = self.get_queryset().filter(user=user)
-        page = self.paginate_queryset(queryset)
+        queryset = self.paginate_queryset(queryset)
         serializer = self.get_serializer(queryset, many=True)
-        if page:
-            return self.get_paginated_response(serializer.data)
-        return Response(serializer.data)
+        return self.get_paginated_response(serializer.data)
 
     @action(detail=False, methods=['DELETE'], permission_classes=[IsAuthenticated], url_name='delete')
     def delete(self, request):

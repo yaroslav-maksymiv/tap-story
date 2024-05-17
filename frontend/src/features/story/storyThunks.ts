@@ -10,7 +10,20 @@ export const listStories = createAsyncThunk('story/list', async () => {
         }
     }
 
-    const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/stories/`, config)
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/stories/?page_size=8`, config)
+    return response.data
+})
+
+export const listMyStories = createAsyncThunk('story/myList', async () => {
+    const config = {
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `JWT ${localStorage.getItem('access')}`
+        }
+    }
+
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/stories/my/?page_size=15`, config)
     return response.data
 })
 
@@ -89,7 +102,7 @@ export const listLikedStories = createAsyncThunk('story/liked', async (credentia
     }
 })
 
-export const saveStory = createAsyncThunk('story/save', async (credentials: {storyId: number}, thunkAPI) => {
+export const saveStory = createAsyncThunk('story/save', async (credentials: { storyId: number }, thunkAPI) => {
     const config = {
         headers: {
             'Content-Type': 'application/json',
@@ -110,7 +123,9 @@ export const saveStory = createAsyncThunk('story/save', async (credentials: {sto
     }
 })
 
-export const removeFromSaved = createAsyncThunk('story/removeSaved', async (credentials: {storyId: number}, thunkAPI) => {
+export const removeFromSaved = createAsyncThunk('story/removeSaved', async (credentials: {
+    storyId: number
+}, thunkAPI) => {
     const config = {
         headers: {
             'Content-Type': 'application/json',
@@ -124,7 +139,10 @@ export const removeFromSaved = createAsyncThunk('story/removeSaved', async (cred
     }
 
     try {
-        const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/saved-stories/delete/`, {data: data, headers: config.headers})
+        const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/saved-stories/delete/`, {
+            data: data,
+            headers: config.headers
+        })
         return response.data
     } catch (err: any) {
         return thunkAPI.rejectWithValue(err.message)
@@ -136,7 +154,7 @@ export const createStory = createAsyncThunk('story/create', async (credentials: 
 }, thunkAPI) => {
     const config = {
         headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'multipart/form-data',
             'Accept': 'application/json',
             'Authorization': `JWT ${localStorage.getItem('access')}`
         }
@@ -147,11 +165,39 @@ export const createStory = createAsyncThunk('story/create', async (credentials: 
     data.append('description', credentials.description)
     data.append('category', credentials.category)
     if (credentials.image) {
+        console.log(credentials.image)
         data.append('image', credentials.image)
     }
 
     try {
         const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/stories/`, data, config)
+        return response.data
+    } catch (err: any) {
+        return thunkAPI.rejectWithValue(err.message)
+    }
+})
+
+export const updateStory = createAsyncThunk('story/update', async (credentials: {
+    id: string, title: string, description: string, category: string, image: File | string | null
+}, thunkAPI) => {
+    const config = {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+            'Accept': 'application/json',
+            'Authorization': `JWT ${localStorage.getItem('access')}`
+        }
+    }
+
+    const data = new FormData()
+    data.append('title', credentials.title)
+    data.append('description', credentials.description)
+    data.append('category', credentials.category)
+    if (credentials.image && typeof credentials.image !== 'string') {
+        data.append('image', credentials.image)
+    }
+
+    try {
+        const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/stories/${credentials.id}/`, data, config)
         return response.data
     } catch (err: any) {
         return thunkAPI.rejectWithValue(err.message)

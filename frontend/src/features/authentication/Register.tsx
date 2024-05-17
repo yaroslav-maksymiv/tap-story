@@ -18,18 +18,46 @@ export const Register: React.FC = () => {
     const navigate = useNavigate()
 
     const {
-        registerErrors,
         isAuthenticated,
         isRegistered,
         registerLoading
     } = useAppSelector(state => state.authentication)
 
+    const [errorMessages, setErrorMessages] = useState<string[]>([])
     const [formData, setFormData] = useState<FormData>({
         email: '',
         password: '',
         rePassword: '',
         username: ''
     })
+
+    const validateForm = () => {
+        const errors = []
+
+        if (!formData.email) {
+            errors.push('Email is required')
+        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+            errors.push('Email is invalid')
+        }
+
+        if (!formData.password) {
+            errors.push('Password is required')
+        } else if (formData.password.length < 6) {
+            errors.push('Password must be at least 6 characters')
+        }
+
+        if (!formData.rePassword) {
+            errors.push('Re-enter Password is required')
+        } else if (formData.password !== formData.rePassword) {
+            errors.push('Passwords do not match')
+        }
+
+        if (!formData.username) {
+            errors.push('Username is required')
+        }
+
+        return errors
+    }
 
     const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({
@@ -40,6 +68,8 @@ export const Register: React.FC = () => {
 
     const handleSubmit = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault()
+        const errors = validateForm()
+        setErrorMessages(errors)
         dispatch(register(formData))
     }
 
@@ -67,7 +97,7 @@ export const Register: React.FC = () => {
     return (
         <>
             <div
-                className="pt-12 flex min-h-screen flex-1 flex-col justify-center px-6 py-12 lg:px-8 bg-black text-white">
+                className="pt-24 flex min-h-screen flex-1 flex-col justify-center px-6 py-12 lg:px-8 bg-black text-white">
                 <div className="sm:mx-auto sm:w-full sm:max-w-sm">
                     <img
                         className="mx-auto h-12 w-auto"
@@ -80,9 +110,9 @@ export const Register: React.FC = () => {
                 </div>
 
                 <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-                    {registerErrors && (
+                    {errorMessages && (
                         <div className="mb-4">
-                            {registerErrors.map((error: string) => <ErrorAlert text={error}/>)}
+                            {errorMessages.map((error: string) => <div className="mb-1"><ErrorAlert text={error} setErrors={setErrorMessages}/></div>)}
                         </div>
                     )}
                     <form className="space-y-6">

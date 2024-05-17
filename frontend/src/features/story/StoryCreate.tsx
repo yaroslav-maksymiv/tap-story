@@ -3,6 +3,7 @@ import {useAppDispatch, useAppSelector} from "../../app/hooks";
 import {listCategories} from "../category/categoryThunks";
 import {useNavigate} from "react-router-dom";
 import {createStory} from "./storyThunks";
+import {ErrorAlert} from "../../components/ErrorAlert";
 
 type DataChangeEvent =
     React.ChangeEvent<HTMLInputElement>
@@ -20,6 +21,7 @@ export const StoryCreate: React.FC = () => {
     const dispatch = useAppDispatch()
     const navigate = useNavigate()
 
+    const [errorMessages, setErrorMessages] = useState<string[]>([])
     const [loading, setLoading] = useState<boolean>(false)
     const [storyData, setStoryData] = useState<StoryData>({
         title: '',
@@ -56,14 +58,17 @@ export const StoryCreate: React.FC = () => {
         e.preventDefault()
 
         if (isAuthenticated) {
-            if (storyData.title && storyData.description && storyData.category) {
+            setErrorMessages([])
+            if (storyData.title && storyData.description && storyData.category && storyData.image) {
                 setLoading(true)
                 dispatch(createStory({...storyData})).then(response => {
                     setLoading(false)
-                    navigate(`/story/edit/${response.payload.id}`)
+                    navigate(`/story/${response.payload.id}/edit`)
                 }).catch(err => {
                     setLoading(false)
                 })
+            } else {
+                setErrorMessages(['All fields must be filled!'])
             }
         } else {
             navigate(`/login?redirect=story/create`)
@@ -73,6 +78,11 @@ export const StoryCreate: React.FC = () => {
     return (
         <div className="pt-24 pb-24 text-white max-w-screen-md">
             <h1 className="text-4xl mb-4">Create Your Story</h1>
+            {errorMessages && (
+                <div className="mb-4">
+                    {errorMessages.map((error: string) => <ErrorAlert text={error} setErrors={setErrorMessages} />)}
+                </div>
+            )}
             <form>
                 <div className="mb-3">
                     <label htmlFor="title" className="block text-sm font-medium leading-6">

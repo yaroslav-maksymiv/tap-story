@@ -61,7 +61,7 @@ export const Notifications: React.FC<Props> = ({setNotificationsVisible}) => {
                     </div>
                 ) : error ? (
                     <div>{error}</div>
-                ) : notifications.length > 0 && (
+                ) : notifications.length > 0 ? (
                     <InfiniteScroll
                         dataLength={notifications.length}
                         next={fetchMoreData}
@@ -88,7 +88,7 @@ export const Notifications: React.FC<Props> = ({setNotificationsVisible}) => {
                             </div>
                         ))}
                     </InfiniteScroll>
-                )}
+                ) : (<div className="text-gray-400">No notifications yet.</div>)}
             </div>
         </div>
     )

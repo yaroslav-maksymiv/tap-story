@@ -86,7 +86,8 @@ export const Navbar: React.FC = () => {
                             </div>
                             <div onClick={() => setNotificationsVisible(prev => !prev)}
                                  className="notifications-open flex gap-1 items-center mr-4 text-white cursor-pointer">
-                                {notificationsCount > 0 &&  (notificationsCount > 10 ? <div>9+</div> : <div>{notificationsCount}</div>)}
+                                {notificationsCount > 0 && (notificationsCount > 10 ? <div>9+</div> :
+                                    <div>{notificationsCount}</div>)}
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                      stroke-width="1.5" stroke="currentColor" className="w-5 h-5">
                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -95,21 +96,25 @@ export const Navbar: React.FC = () => {
                             </div>
                             <div className="relative">
                                 <div onClick={() => setMenuVisible(prevState => !prevState)} className="menu-activate">
-                                    {user?.photo ? (
-                                        <img src={require("../assets/avatar.jpg")} className="w-10 h-10 rounded-full"
-                                             alt="Avatar"/>
-                                    ) : (
-                                        <img src={require("../assets/avatar.jpg")} className="w-10 h-10 rounded-full"
-                                             alt="Avatar"/>
-                                    )}
+                                    <div className="cursor-pointer">
+                                        {user?.photo ? (
+                                            <img src={require("../assets/avatar.jpg")}
+                                                 className="w-10 h-10 rounded-full"
+                                                 alt="Avatar"/>
+                                        ) : (
+                                            <img src={require("../assets/avatar.jpg")}
+                                                 className="w-10 h-10 rounded-full"
+                                                 alt="Avatar"/>
+                                        )}
+                                    </div>
                                 </div>
-                                {menuVisible && (
+                                {user && menuVisible && (
                                     <div
                                         className="menu text-white w-52 absolute top-14 right-0 bg-gray-800 px-2 py-3 rounded-md flex flex-col gap-2">
-                                        <Link to={'/profile'}>
+                                        <Link to={`/profile/${user.id}`}>
                                             <div className="hover:bg-gray-700 px-1 rounded-md">Profile</div>
                                         </Link>
-                                        <Link to={'/story/my'}>
+                                        <Link to={'/my/stories'}>
                                             <div className="hover:bg-gray-700 px-1 rounded-md">My Stories</div>
                                         </Link>
                                     </div>

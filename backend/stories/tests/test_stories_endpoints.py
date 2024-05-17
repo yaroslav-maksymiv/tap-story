@@ -247,6 +247,17 @@ class TestSavedStoryViewSet:
         assert response.status_code == 200
         assert len(data.get('results')) == 3
 
+    def test_empty_list_saved_stories(self, user_factory, saved_story_factory, get_jwt_token, api_client):
+        user = user_factory()
+        token = get_jwt_token(current_user=user)
+        url = reverse('saved-stories-list')
+        api_client.credentials(HTTP_AUTHORIZATION=f'JWT {token}')
+
+        response = api_client.get(url)
+        data = json.loads(response.content)
+        assert response.status_code == 200
+        assert len(data.get('results')) == 0
+
     def test_delete_saved_story(self, user_factory, saved_story_factory, get_jwt_token, api_client):
         user = user_factory()
         saved_story = saved_story_factory(user=user)

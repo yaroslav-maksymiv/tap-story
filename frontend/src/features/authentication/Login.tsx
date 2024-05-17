@@ -14,12 +14,31 @@ export const Login: React.FC = () => {
     const dispatch = useAppDispatch()
     const navigate = useNavigate()
 
-    const {loginErrors, isAuthenticated, loginLoading} = useAppSelector(state => state.authentication)
+    const {isAuthenticated, loginLoading} = useAppSelector(state => state.authentication)
 
+    const [errorMessages, setErrorMessages] = useState<string[]>([])
     const [formData, setFormData] = useState<FormData>({
         email: '',
         password: ''
     })
+
+    const validateForm = () => {
+        const errors = []
+
+        if (!formData.email) {
+            errors.push('Email is required')
+        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+            errors.push('Email is invalid')
+        }
+
+        if (!formData.password) {
+            errors.push('Password is required')
+        } else if (formData.password.length < 6) {
+            errors.push('Password must be at least 6 characters')
+        }
+
+        return errors
+    }
 
     const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({
@@ -30,8 +49,9 @@ export const Login: React.FC = () => {
 
     const handleSubmit = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault()
+        const errors = validateForm()
+        setErrorMessages(errors)
         dispatch(login(formData))
-        setFormData({email: '', password: ''})
     }
 
     const redirectUrl = new URLSearchParams(location.search).get('redirect')
@@ -62,9 +82,9 @@ export const Login: React.FC = () => {
                 </div>
 
                 <div className="mt-4 sm:mx-auto sm:w-full sm:max-w-sm">
-                    {loginErrors && (
+                    {errorMessages && (
                         <div className="mb-4">
-                            {loginErrors.map((error: string) => <ErrorAlert text={error}/>)}
+                            {errorMessages.map((error: string) => <div className="mb-1"><ErrorAlert text={error} setErrors={setErrorMessages}/></div>)}
                         </div>
                     )}
                     <form className="space-y-6">

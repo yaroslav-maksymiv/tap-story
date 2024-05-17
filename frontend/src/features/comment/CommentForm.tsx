@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
 import {createComment} from "./commentThunk";
 import {useNavigate} from "react-router-dom";
@@ -13,9 +13,8 @@ export const CommentForm: React.FC<Props> = ({id}) => {
     const navigate = useNavigate()
 
     const {isAuthenticated} = useAppSelector(state => state.authentication)
-    const {loading: loadingCreate, error: errorCreate, comment} = useAppSelector(state => state.comment)
+    const {loading: loadingCreate} = useAppSelector(state => state.comment)
     const loading = loadingCreate.create
-    const error = errorCreate.create
 
     const [text, setText] = useState<string>('')
     const [warning, setWarning] = useState<string>('')
@@ -25,7 +24,18 @@ export const CommentForm: React.FC<Props> = ({id}) => {
         if (id) {
             if (isAuthenticated) {
                 if (text && text.length > 0) {
-                    dispatch(createComment({storyId: id, text}))
+                    dispatch(createComment({storyId: id, text})).then(response => {
+                        toast('Your comment has been added!', {
+                            position: "top-right",
+                            autoClose: 2000,
+                            hideProgressBar: false,
+                            closeOnClick: false,
+                            pauseOnHover: false,
+                            draggable: true,
+                            theme: "dark",
+                            transition: Bounce
+                        })
+                    })
                     setText('')
                 } else {
                     setWarning('Comment text cannot be empty!')
@@ -35,21 +45,6 @@ export const CommentForm: React.FC<Props> = ({id}) => {
             }
         }
     }
-
-    useEffect(() => {
-        if (comment) {
-             toast('Your comment has been added!', {
-                position: "top-right",
-                autoClose: 2000,
-                hideProgressBar: false,
-                closeOnClick: false,
-                pauseOnHover: false,
-                draggable: true,
-                theme: "dark",
-                transition: Bounce
-            })
-        }
-    }, [comment])
 
     return (
         <form className="bg-gray-700 p-4 rounded-lg shadow-md">

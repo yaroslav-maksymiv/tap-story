@@ -1,51 +1,27 @@
 import React, {useEffect, useState} from "react";
-import {Link} from "react-router-dom";
-import {useAppDispatch, useAppSelector} from "../../app/hooks";
 import {Loading} from "../../components/Loading";
-import {listLikedStories, listSavedStories} from "./storyThunks";
+import {Link, useNavigate} from "react-router-dom";
+import {useAppDispatch, useAppSelector} from "../../app/hooks";
+import {listMyStories} from "./storyThunks";
 
-export const StoriesLibrary: React.FC = () => {
+export const MyStories: React.FC = () => {
     const dispatch = useAppDispatch()
-
-    const [activeTab, setActivateTab] = useState<number>(1)
+    const navigate = useNavigate()
 
     const {isAuthenticated} = useAppSelector(state => state.authentication)
     const {stories, loading} = useAppSelector(state => state.story)
 
     useEffect(() => {
-        if (isAuthenticated) {
-            switch (activeTab) {
-                case 1:
-                    dispatch(listSavedStories({}))
-                    break
-                case 2:
-                    dispatch(listLikedStories({}))
-                    break
-            }
-        }
-    }, [activeTab])
+        dispatch(listMyStories())
+    }, [])
+
+    if (!isAuthenticated) {
+        navigate('/login?redirect=my/stories')
+    }
 
     return (
         <div className="py-24 text-white">
-            <div className="text-4xl mb-5">Library</div>
-            <div className="flex gap-3 items-center mb-8">
-                {/*<button onClick={() => setActivateTab(1)}*/}
-                {/*        className={`${activeTab === 1 ? 'bg-blue-600' : 'bg-gray-800'} flex justify-center rounded-md px-5 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600`}>*/}
-                {/*    In process*/}
-                {/*</button>*/}
-                {/*<button onClick={() => setActivateTab(2)}*/}
-                {/*        className={`${activeTab === 2 ? 'bg-blue-600' : 'bg-gray-800'} flex justify-center rounded-md px-5 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600`}>*/}
-                {/*    Finished*/}
-                {/*</button>*/}
-                <button onClick={() => setActivateTab(1)}
-                        className={`${activeTab === 1 ? 'bg-blue-600' : 'bg-gray-800'} flex justify-center rounded-md px-5 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600`}>
-                    Saved
-                </button>
-                <button onClick={() => setActivateTab(2)}
-                        className={`${activeTab === 2 ? 'bg-blue-600' : 'bg-gray-800'} flex justify-center rounded-md px-5 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600`}>
-                    Liked
-                </button>
-            </div>
+            <div className="text-4xl mb-5">My Stories</div>
             <div className="flex flex-col gap-5">
                 {loading ? (
                     <div className="w-full h-full flex justify-center items-center">
@@ -59,11 +35,8 @@ export const StoriesLibrary: React.FC = () => {
                                  alt=""/>
                         </Link>
                         <div className="">
-                            <Link to={`/story/${story.id}`}>
+                            <Link to={`/story/${story.id}/edit`}>
                                 <div className="text-2xl">{story.title}</div>
-                            </Link>
-                            <Link to={`/author`}>
-                                <div className="mb-1">{story.author.username}</div>
                             </Link>
                             <div className="flex gap-2 text-sm font-medium text-gray-600">
                                 <div className="flex items-center gap-0.5">
@@ -87,7 +60,7 @@ export const StoriesLibrary: React.FC = () => {
                             </div>
                         </div>
                     </div>
-                )) : <div className="text-gray-400">Empty.</div>}
+                )) : (<div className="text-gray-400">No stories yet.</div>)}
             </div>
         </div>
     )
