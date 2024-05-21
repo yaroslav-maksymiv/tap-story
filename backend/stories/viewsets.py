@@ -6,6 +6,7 @@ from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
+from django.db.models import Count
 from datetime import datetime
 
 from .models import (
@@ -71,11 +72,15 @@ class StoryViewSet(ModelViewSet):
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
 
     search_fields = ['title']
-    ordering_fields = ['created_at', 'views']
+    ordering_fields = ['created_at', 'likes_count']
 
     def list(self, request, *args, **kwargs):
-        queryset = self.queryset
-        # queryset = self.filter_queryset(self.queryset)
+        queryset = self.queryset.annotate(likes_count=Count('likes'))
+        category_id = request.query_params.get('category')
+        if category_id:
+            category = get_object_or_404(Category, pk=category_id)
+            queryset = queryset.filter(category=category)
+        queryset = self.filter_queryset(queryset)
         queryset = self.paginate_queryset(queryset)
         serializer = self.get_serializer(queryset, many=True)
         return self.get_paginated_response(serializer.data)
@@ -198,6 +203,11 @@ class StoryViewSet(ModelViewSet):
         queryset = self.paginate_queryset(queryset)
         serializer = self.get_serializer(queryset, many=True)
         return self.get_paginated_response(serializer.data)
+
+    @action(detail=False, methods=['GET'], url_path='random', url_name='random')
+    def get_random(self, request, *args, **kwargs):
+        random_story = self.queryset.order_by('?').first()
+        return Response(self.get_serializer(random_story).data)
 
 
 class CharacterViewSet(ModelViewSet):

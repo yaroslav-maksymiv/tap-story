@@ -2,7 +2,7 @@ import {createAsyncThunk} from "@reduxjs/toolkit";
 import axios from "axios";
 import {ConfigType} from "../../types";
 
-export const listStories = createAsyncThunk('story/list', async () => {
+export const listStories = createAsyncThunk('story/list', async (credentials?: {category?: number | null, search?: string, orderBy?: string}) => {
     const config = {
         headers: {
             'Content-Type': 'application/json',
@@ -10,7 +10,18 @@ export const listStories = createAsyncThunk('story/list', async () => {
         }
     }
 
-    const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/stories/?page_size=8`, config)
+    let queryParams = `?page_size=8`
+    if (credentials?.category) {
+        queryParams += `&category=${credentials.category}`
+    }
+    if (credentials?.search) {
+        queryParams += `&search=${credentials.search}`
+    }
+    if (credentials?.orderBy) {
+        queryParams += `&ordering=${credentials.orderBy}`
+    }
+
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/stories/${queryParams}`, config)
     return response.data
 })
 
@@ -202,4 +213,16 @@ export const updateStory = createAsyncThunk('story/update', async (credentials: 
     } catch (err: any) {
         return thunkAPI.rejectWithValue(err.message)
     }
+})
+
+export const randomStory = createAsyncThunk('story/random', async () => {
+    const config = {
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        }
+    }
+
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/stories/random`, config)
+    return response.data
 })

@@ -3,7 +3,7 @@ import json
 
 from django.urls import reverse
 
-from ..models import SavedStory
+from ..models import SavedStory, Story
 
 pytestmark = pytest.mark.django_db
 
@@ -91,6 +91,30 @@ class TestStoryEndpoints:
 
         assert response.status_code == 200
         assert int(json.loads(response.content).get('total', 0)) == 4
+
+    def test_get_random(self, story_factory, api_client):
+        url = reverse('stories-random')
+        story_factory.create_batch(5)
+        response = api_client.get(url)
+
+        assert response.status_code == 200
+        assert Story.objects.filter(id=response.data.get('id')).exists()
+
+    def test_order_by_likes_count(self, story_factory, user_factory, api_client):
+        url = reverse('stories-list')
+        url = f'{url}?ordering=-likes_count'
+
+        user1 = user_factory()
+        user2 = user_factory()
+        story_factory(likes=[user1, user2])
+        story_factory(likes=[user2])
+
+        response = api_client.get(url)
+
+        assert response.status_code == 200
+        assert len(response.data.get('results')) == 2
+        assert response.data.get('results')[0].get('likes_count') == 2
+        assert response.data.get('results')[1].get('likes_count') == 1
 
     def test_retrieve(self, story_factory, api_client):
         story = story_factory()

@@ -6,13 +6,13 @@ import {Register} from "./features/authentication/Register";
 import {Home} from "./screens/Home";
 import Layout from "./hocs/Layout";
 import {AccountActivation} from "./features/authentication/AccountActivation";
-import {Search} from "./screens/Search";
 import {Story} from "./features/story/Story";
 import {WebSocketComponent} from "./components/WebSocketComponent";
 import {StoriesLibrary} from "./features/story/StoriesLibrary";
 import {StoryCreate} from "./features/story/StoryCreate";
 import {MyStories} from "./features/story/MyStories";
 import {StoryEdit} from "./features/story/StoryEdit";
+import {StoriesSearch} from "./features/story/StoriesSearch";
 
 const App: React.FC = () => {
     return (
@@ -21,7 +21,7 @@ const App: React.FC = () => {
             <Layout>
                 <Routes>
                     <Route path='/' element={<Home/>}/>
-                    <Route path='/search' element={<Search/>}/>
+                    <Route path='/search' element={<StoriesSearch/>}/>
                     <Route path='/library' element={<StoriesLibrary/>}/>
 
                     <Route path='/my/stories' element={<MyStories/>}/>

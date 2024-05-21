@@ -1,13 +1,15 @@
 import React, {useEffect, useState} from "react";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import {useAppDispatch, useAppSelector} from "../app/hooks";
 import {logout} from "../features/authentication/authenticationSlice";
 import {Notifications} from "../features/notification/Notifications";
 import {countUnreadNotifications} from "../features/notification/notificationThunk";
 import {resetNotificationsCount} from "../features/notification/notificationSlice";
+import {randomStory} from "../features/story/storyThunks";
 
 export const Navbar: React.FC = () => {
     const dispatch = useAppDispatch()
+    const navigate = useNavigate()
 
     const {isAuthenticated, user} = useAppSelector(state => state.authentication)
     const {notificationsCount} = useAppSelector(state => state.notification)
@@ -44,6 +46,12 @@ export const Navbar: React.FC = () => {
 
     const handleLogout = () => {
         dispatch(logout())
+    }
+
+    const getRandomStory = () => {
+        dispatch(randomStory()).then(response => {
+            navigate(`/story/${response.payload.id}`)
+        })
     }
 
     return (
@@ -161,12 +169,10 @@ export const Navbar: React.FC = () => {
                             <li><Link to={'/search'}
                                       className="block py-2 pr-4 pl-3 text-white rounded bg-primary-700 lg:bg-transparent lg:text-primary-700 lg:p-0 dark:text-white"
                                       aria-current="page">Search 🔎</Link></li>
-                            <li><Link to={'/top-ranked'}
-                                      className="block py-2 pr-4 pl-3 text-white rounded bg-primary-700 lg:bg-transparent lg:text-primary-700 lg:p-0 dark:text-white"
-                                      aria-current="page">Top Ranked 🏆</Link></li>
                             <li>
                                 <div
-                                    className="block py-2 pr-4 pl-3 text-white rounded bg-primary-700 lg:bg-transparent lg:text-primary-700 lg:p-0 dark:text-white"
+                                    onClick={() => getRandomStory()}
+                                    className="cursor-pointer block py-2 pr-4 pl-3 text-white rounded bg-primary-700 lg:bg-transparent lg:text-primary-700 lg:p-0 dark:text-white"
                                     aria-current="page">Random Story 🎲
                                 </div>
                             </li>
