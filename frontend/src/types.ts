@@ -9,6 +9,7 @@ export type PaginatedResponse<T> = {
     page: number
     page_size: number
     results: T[]
+    loadMore?: boolean
 }
 
 export type ConfigType = {

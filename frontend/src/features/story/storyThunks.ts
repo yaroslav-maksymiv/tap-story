@@ -2,7 +2,7 @@ import {createAsyncThunk} from "@reduxjs/toolkit";
 import axios from "axios";
 import {ConfigType} from "../../types";
 
-export const listStories = createAsyncThunk('story/list', async (credentials?: {category?: number | null, search?: string, orderBy?: string}) => {
+export const listStories = createAsyncThunk('story/list', async (credentials?: {url?: string, category?: number | null, search?: string, orderBy?: string}) => {
     const config = {
         headers: {
             'Content-Type': 'application/json',
@@ -10,7 +10,7 @@ export const listStories = createAsyncThunk('story/list', async (credentials?: {
         }
     }
 
-    let queryParams = `?page_size=8`
+    let queryParams = ''
     if (credentials?.category) {
         queryParams += `&category=${credentials.category}`
     }
@@ -21,7 +21,14 @@ export const listStories = createAsyncThunk('story/list', async (credentials?: {
         queryParams += `&ordering=${credentials.orderBy}`
     }
 
-    const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/stories/${queryParams}`, config)
+    const requestUrl = credentials?.url
+        ? credentials.url
+        : `${process.env.REACT_APP_API_URL}/api/stories/?page_size=8${queryParams}`
+
+    const response = await axios.get(requestUrl, config)
+    if (credentials?.url) {
+        response.data['loadMore'] = true
+    }
     return response.data
 })
 

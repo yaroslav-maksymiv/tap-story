@@ -58,7 +58,11 @@ const storySlice = createSlice({
             state.loading = true
         })
         builder.addCase(listStories.fulfilled, (state, action: PayloadAction<PaginatedResponse<Story>>) => {
-            state.stories = action.payload.results
+            if (action.payload.loadMore) {
+                state.stories = [...state.stories, ...action.payload.results]
+            } else {
+                state.stories = action.payload.results
+            }
             savePaginatedResponseToState<StoryState, Story>(state, action)
         })
         builder.addCase(listStories.rejected, (state) => {
