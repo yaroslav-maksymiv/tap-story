@@ -5,6 +5,7 @@ import {Link, useNavigate, useParams} from "react-router-dom";
 import {ErrorAlert} from "../../components/ErrorAlert";
 import {singleStory, updateStory} from "./storyThunks";
 import {Loading} from "../../components/Loading";
+import {EpisodesMenu} from "../episode/EpisodesMenu";
 
 type DataChangeEvent =
     React.ChangeEvent<HTMLInputElement>
@@ -218,37 +219,43 @@ export const StoryEdit: React.FC = () => {
                     </>
                 )}
             </div>
-            <div className="w-2/5 bg-gray-800 rounded-md p-4">
-                {storyLoading ? (
-                    <div className="w-full h-full flex justify-center items-center">
-                        <Loading/>
-                    </div>
-                ) : story && (<div>
-                    <div className="text-2xl mb-4">Total Info</div>
-                    <div className="mt-5 flex flex-col gap-2 text-sm font-medium text-gray-400">
-                        <div className="text-lg flex items-center gap-2 cursor-pointer text-white">
-                            <div>Likes:</div>
-                            {story.likes_count}
+            <div className="w-2/5">
+                <div className="h-auto bg-gray-800 rounded-md py-6 px-7 mb-5">
+                    {storyLoading ? (
+                        <div className="w-full h-full flex justify-center items-center">
+                            <Loading/>
                         </div>
-                        <div className="text-lg flex items-center gap-2 text-white">
-                            <div>Views:</div>
-                            {story.views}
+                    ) : story && (<div>
+                        <div className="text-2xl mb-4">Total Info</div>
+                        <div className="mt-5 flex flex-col gap-2 text-sm font-medium text-gray-400">
+                            <div className="text-lg flex items-center gap-2 cursor-pointer text-white">
+                                <div>Likes:</div>
+                                {story.likes_count}
+                            </div>
+                            <div className="text-lg flex items-center gap-2 text-white">
+                                <div>Views:</div>
+                                {story.views}
+                            </div>
+                            <div className="text-lg flex items-center gap-2 text-white">
+                                <div>Comments:</div>
+                                {story.comments_count}
+                            </div>
                         </div>
-                        <div className="text-lg flex items-center gap-2 text-white">
-                            <div>Comments:</div>
-                            {story.comments_count}
+                        <div className="mt-4">
+                            <Link to={`/story/${id}`}>
+                                <button
+                                    className="flex w-full justify-center rounded-md bg-blue-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                >
+                                    View
+                                </button>
+                            </Link>
                         </div>
-                    </div>
-                    <div className="mt-4">
-                        <Link to={`/story/${id}`}>
-                            <button
-                                className="flex w-full justify-center rounded-md bg-blue-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                            >
-                                View
-                            </button>
-                        </Link>
-                    </div>
-                </div>)}
+                    </div>)}
+                </div>
+
+                {story && (
+                    <EpisodesMenu storyId={story.id} />
+                )}
             </div>
         </div>
     )

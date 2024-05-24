@@ -13,6 +13,7 @@ import {StoryCreate} from "./features/story/StoryCreate";
 import {MyStories} from "./features/story/MyStories";
 import {StoryEdit} from "./features/story/StoryEdit";
 import {StoriesSearch} from "./features/story/StoriesSearch";
+import {Episode} from "./features/episode/Episode";
 
 const App: React.FC = () => {
     return (
@@ -20,14 +21,15 @@ const App: React.FC = () => {
             <WebSocketComponent />
             <Layout>
                 <Routes>
-                    <Route path='/' element={<Home/>}/>
-                    <Route path='/search' element={<StoriesSearch/>}/>
+                    <Route path='/' element={<StoriesSearch/>}/>
+                    <Route path='/home' element={<Home/>}/>
                     <Route path='/library' element={<StoriesLibrary/>}/>
 
                     <Route path='/my/stories' element={<MyStories/>}/>
                     <Route path='/story/create' element={<StoryCreate/>}/>
                     <Route path='/story/:id' element={<Story/>}/>
                     <Route path='/story/:id/edit' element={<StoryEdit/>}/>
+                    <Route path='/episode/:id/edit' element={<Episode/>}/>
 
                     <Route path='/login' element={<Login/>}/>
                     <Route path='/register' element={<Register/>}/>

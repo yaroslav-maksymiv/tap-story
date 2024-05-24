@@ -5,6 +5,7 @@ import categoryReducer from '../features/category/categorySlice'
 import storyReducer from '../features/story/storySlice'
 import commentReducer from '../features/comment/commentSlice'
 import notificationReducer from '../features/notification/notificationSlice'
+import episodeReducer from '../features/episode/episodeSlice'
 
 const store = configureStore({
     reducer: {
@@ -12,7 +13,8 @@ const store = configureStore({
         category: categoryReducer,
         story: storyReducer,
         comment: commentReducer,
-        notification: notificationReducer
+        notification: notificationReducer,
+        episode: episodeReducer,
     }
 })
 

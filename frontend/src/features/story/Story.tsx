@@ -141,7 +141,7 @@ export const Story: React.FC = () => {
                                 </div>
                             </div>
                             <button
-                                className="btn mt-5 flex w-full justify-center rounded-md bg-blue-600 px-24 py-3 text-lg font-semibold leading-6 text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Read
+                                className="btn mt-5 max-w-96 flex w-full justify-center rounded-md bg-blue-600 px-24 py-2 text-lg font-semibold leading-6 text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Read
                             </button>
                         </div>
                     </div>

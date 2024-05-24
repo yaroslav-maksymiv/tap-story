@@ -13,7 +13,7 @@ export const StoriesSearch: React.FC = () => {
     const {stories, nextLink, hasMore} = useAppSelector(state => state.story)
 
     const [searchText, setSearchText] = useState<string>('')
-    const [orderBy, setOrderBy] = useState<string>('')
+    const [orderBy, setOrderBy] = useState<string>('-created_at')
     const [category, setCategory] = useState<number | null>(null)
     const debounce = useDebounce(searchText, 500)
 
@@ -29,9 +29,9 @@ export const StoriesSearch: React.FC = () => {
 
     return (
         <div className="py-28 text-white">
-            <h1 className="text-2xl">Search</h1>
+            <h1 className="text-4xl font-bold">Search</h1>
 
-            <div className="text-white mt-6">
+            <div className="text-white mt-6 mb-2">
                 <div className="relative mt-2 rounded-md shadow-sm">
                     <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                         <span className="text-gray-500 sm:text-sm">🔎</span>
@@ -42,7 +42,7 @@ export const StoriesSearch: React.FC = () => {
                         id="search"
                         value={searchText}
                         onChange={(e) => setSearchText(e.target.value)}
-                        className="block w-full rounded-md border-0 py-1.5 pl-10 pr-20 text-gray-300 ring-1 ring-inset ring-gray-600 placeholder-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 bg-gray-800"
+                        className="block w-full rounded-md border-0 py-2.5 pl-10 pr-20 text-gray-300 ring-1 ring-inset ring-gray-600 placeholder-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 bg-gray-800"
                         placeholder="Type story name..."
                     />
                 </div>
@@ -51,10 +51,9 @@ export const StoriesSearch: React.FC = () => {
             <div className="mb-2">
                 <Categories category={category} setCategory={setCategory}/>
             </div>
-            <div className="mb-5">
+            <div className="mb-10">
                 <select id="order" name="order" onChange={e => setOrderBy(e.target.value)} required
-                        className="bg-gray-800 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-60 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                    <option selected>Choose a category</option>
+                        className="bg-gray-800 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-40 p-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                     <option value={'-created_at'}>Newest</option>
                     <option value={'created_at'}>Oldest</option>
                     <option value={'-likes_count'}>Most Likes</option>

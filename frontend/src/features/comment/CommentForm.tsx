@@ -48,8 +48,6 @@ export const CommentForm: React.FC<Props> = ({id}) => {
 
     return (
         <form className="bg-gray-700 p-4 rounded-lg shadow-md">
-            <h3 className="text-lg font-bold mb-2">Add a comment</h3>
-
             {warning && (
                 <div className="my-2 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
                      role="alert">

@@ -161,12 +161,7 @@ export const Navbar: React.FC = () => {
                     <div className="hidden justify-between items-center w-full lg:flex lg:w-auto lg:order-1"
                          id="mobile-menu-2">
                         <ul className="flex flex-col mt-4 font-medium lg:flex-row lg:space-x-8 lg:mt-0">
-                            <li>
-                                <Link to={'/'}
-                                      className="block py-2 pr-4 pl-3 text-white rounded bg-primary-700 lg:bg-transparent lg:text-primary-700 lg:p-0 dark:text-white"
-                                      aria-current="page">Main 💻</Link>
-                            </li>
-                            <li><Link to={'/search'}
+                            <li><Link to={'/'}
                                       className="block py-2 pr-4 pl-3 text-white rounded bg-primary-700 lg:bg-transparent lg:text-primary-700 lg:p-0 dark:text-white"
                                       aria-current="page">Search 🔎</Link></li>
                             <li>
@@ -175,6 +170,11 @@ export const Navbar: React.FC = () => {
                                     className="cursor-pointer block py-2 pr-4 pl-3 text-white rounded bg-primary-700 lg:bg-transparent lg:text-primary-700 lg:p-0 dark:text-white"
                                     aria-current="page">Random Story 🎲
                                 </div>
+                            </li>
+                              <li>
+                                <Link to={'/home'}
+                                      className="block py-2 pr-4 pl-3 text-white rounded bg-primary-700 lg:bg-transparent lg:text-primary-700 lg:p-0 dark:text-white"
+                                      aria-current="page">About 💻</Link>
                             </li>
                         </ul>
                     </div>

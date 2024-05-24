@@ -26,7 +26,7 @@ export const Categories: React.FC<Props> = ({category, setCategory}) => {
     }
 
     return (
-        <div className="w-full py-2 mt-4 flex flex-wrap gap-3 align-center">
+        <div className="w-full py-2 flex flex-wrap gap-3 align-center">
             {loading && <div className="w-full flex justify-center align-center">
                 <Loading/>
             </div>}

@@ -2,7 +2,6 @@ import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {User} from "../authentication/authenticationSlice";
 import {createComment, deleteComment, listComments, toggleLikeComment} from "./commentThunk";
 import {PaginatedResponse} from "../../types";
-import {toggleLikeStory} from "../story/storyThunks";
 
 export type Comment = {
     id: number
