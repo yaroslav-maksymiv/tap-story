@@ -6,6 +6,7 @@ import storyReducer from '../features/story/storySlice'
 import commentReducer from '../features/comment/commentSlice'
 import notificationReducer from '../features/notification/notificationSlice'
 import episodeReducer from '../features/episode/episodeSlice'
+import characterReducer from '../features/character/characterSlice'
 
 const store = configureStore({
     reducer: {
@@ -15,6 +16,7 @@ const store = configureStore({
         comment: commentReducer,
         notification: notificationReducer,
         episode: episodeReducer,
+        character: characterReducer,
     }
 })
 

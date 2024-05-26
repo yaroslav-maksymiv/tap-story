@@ -88,14 +88,20 @@ class Episode(Timestamp):
     title = models.CharField(max_length=255)
     story = models.ForeignKey(Story, related_name='episodes', on_delete=models.CASCADE)
 
+    class Meta:
+        ordering = ['created_at']
+
     def __str__(self):
-        return f'Episode {self.order}: {self.title}'
+        return f'Episode {self.story}: {self.title}'
 
 
 class Character(models.Model):
     name = models.CharField(max_length=50, unique=True)
     story = models.ForeignKey(Story, related_name='characters', on_delete=models.CASCADE)
-    color = models.CharField(max_length=7, unique=True, validators=[validate_hex_color], null=True, blank=True)
+    color = models.CharField(max_length=7, unique=True, validators=[validate_hex_color])
+
+    class Meta:
+        ordering = ['-id']
 
     def __str__(self):
         return self.name
@@ -115,11 +121,11 @@ class Message(Timestamp):
     order = models.FloatField(unique=True)
     message_type = models.CharField(max_length=20, choices=MESSAGE_TYPES, default='text')
 
-    text_content = models.TextField(max_length=200, blank=True, null=True)
+    text_content = models.TextField(max_length=200, blank=True, default='')
     image_content = models.ImageField(upload_to='message_images', blank=True, null=True)
     video_content = models.FileField(upload_to='message_videos', blank=True, null=True)
     audio_content = models.FileField(upload_to='message_audios', blank=True, null=True)
-    status_content = models.CharField(max_length=255, blank=True, null=True)
+    status_content = models.CharField(max_length=255, blank=True, default='')
 
     class Meta:
         ordering = ['order']

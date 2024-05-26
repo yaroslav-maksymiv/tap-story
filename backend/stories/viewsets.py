@@ -227,7 +227,7 @@ class CharacterViewSet(ModelViewSet):
             if serializer.is_valid():
                 character = serializer.save()
                 return Response(self.get_serializer(character).data, status=status.HTTP_201_CREATED)
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_403_FORBIDDEN)
 
     def partial_update(self, request, pk=None, *args, **kwargs):

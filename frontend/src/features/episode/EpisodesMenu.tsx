@@ -36,6 +36,7 @@ export const EpisodesMenu: React.FC<Props> = ({storyId}) => {
 
     return (
         <div className="h-auto bg-gray-800 rounded-md py-6 px-7 mb-5">
+            <div className="text-2xl mb-4">Episodes</div>
             <div className="mb-4">
                 {loading.list ? (
                     <div className='w-full justify-center'>

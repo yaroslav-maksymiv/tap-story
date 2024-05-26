@@ -4,6 +4,7 @@ import {useAppDispatch, useAppSelector} from "../../app/hooks";
 import {singleEpisode} from "./episodeThunk";
 import {Loading} from "../../components/Loading";
 import {singleStory} from "../story/storyThunks";
+import {CharactersMenu} from "../character/CharactersMenu";
 
 export const Episode: React.FC = () => {
     const dispatch = useAppDispatch()
@@ -12,6 +13,7 @@ export const Episode: React.FC = () => {
 
     const {user} = useAppSelector(state => state.authentication)
     const {episode, loading} = useAppSelector(state => state.episode)
+    const {story} = useAppSelector(state => state.story)
 
     const [episodeVisible, setEpisodeVisible] = useState<boolean>(false)
     const [infoText, setInfoText] = useState<string>('')
@@ -39,19 +41,27 @@ export const Episode: React.FC = () => {
     }, [episode, user])
 
     return (
-        <div className="py-24 text-white min-h-screen">
-            {loading.single ? (
+        <div className="py-28 text-white min-h-screen ">
+            {loading.single && (
                 <div className="w-full h-full flex justify-center items-center"><Loading size={50}/></div>
-            ) : episode && episodeVisible && (
-                <div>
-                    <h1 className="text-4xl">Episode: {episode.title}</h1>
-
+            )}
+            <div className="w-full flex gap-10">
+                <div className="w-3/5">
+                    {episode && episodeVisible && (
+                        <div>
+                            <h1 className="text-4xl">Episode: {episode.title}</h1>
+                        </div>
+                    )}
+                    {infoText && (
+                        <div className="text-xl flex justify-center items-center">{infoText}</div>
+                    )}
                 </div>
-            )}
-
-            {infoText && (
-                <div className="text-xl flex justify-center items-center">{infoText}</div>
-            )}
+                <div className="w-2/5">
+                    {story && (
+                        <CharactersMenu storyId={story.id}/>
+                    )}
+                </div>
+            </div>
         </div>
     )
 }
