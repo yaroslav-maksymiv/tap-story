@@ -96,15 +96,20 @@ class Episode(Timestamp):
 
 
 class Character(models.Model):
-    name = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=50)
     story = models.ForeignKey(Story, related_name='characters', on_delete=models.CASCADE)
-    color = models.CharField(max_length=7, unique=True, validators=[validate_hex_color])
+    color = models.CharField(max_length=7, validators=[validate_hex_color])
 
     class Meta:
         ordering = ['-id']
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        self.color = self.color.upper()
+        validate_hex_color(self.color)
+        super().save(*args, **kwargs)
 
 
 class Message(Timestamp):
@@ -132,6 +137,3 @@ class Message(Timestamp):
 
     def __str__(self):
         return f'{self.character.name} - {self.message_type}'
-
-
-

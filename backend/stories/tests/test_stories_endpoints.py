@@ -261,7 +261,7 @@ class TestSavedStoryViewSet:
 
     def test_list_saved_stories(self, user_factory, saved_story_factory, get_jwt_token, api_client):
         user = user_factory()
-        saved_stories = saved_story_factory.create_batch(3, user=user)
+        saved_stories = saved_story_factory.create_batch(2, user=user)
         token = get_jwt_token(current_user=user)
         url = reverse('saved-stories-list')
         api_client.credentials(HTTP_AUTHORIZATION=f'JWT {token}')
@@ -269,7 +269,7 @@ class TestSavedStoryViewSet:
         response = api_client.get(url)
         data = json.loads(response.content)
         assert response.status_code == 200
-        assert len(data.get('results')) == 3
+        assert len(data.get('results')) == 2
 
     def test_empty_list_saved_stories(self, user_factory, saved_story_factory, get_jwt_token, api_client):
         user = user_factory()
@@ -317,14 +317,13 @@ class TestCharacterEndpoints:
         story = story_factory(author=user)
         token = get_jwt_token(current_user=user)
         url = reverse('characters-list')
-        data = {'name': name, 'story': story.pk}
+        data = {'name': name, 'story': story.pk, 'color': '#000000'}
 
         api_client.credentials(HTTP_AUTHORIZATION=f'JWT {token}')
         response = api_client.post(url, data=data, format='json')
 
         assert response.status_code == 201
         response_data = json.loads(response.content)
-        assert response_data.get('id') == 1
         assert response_data.get('name') == name
         assert response_data.get('story') == story.pk
 

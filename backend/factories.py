@@ -102,6 +102,7 @@ class CharacterFactory(factory.django.DjangoModelFactory):
 
     name = factory.Sequence(lambda n: f'Character name {n}')
     story = factory.SubFactory(StoryFactory)
+    color = factory.Faker('hex_color')
 
 
 class SavedStoryFactory(factory.django.DjangoModelFactory):

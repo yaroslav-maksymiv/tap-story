@@ -19,7 +19,7 @@ export const EpisodesMenu: React.FC<Props> = ({storyId}) => {
 
     useEffect(() => {
         dispatch(listEpisodes({storyId}))
-    }, [])
+    }, [storyId])
 
     const createNewEpisode = () => {
         if (title) {

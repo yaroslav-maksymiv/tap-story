@@ -1,0 +1,36 @@
+import {createAsyncThunk} from "@reduxjs/toolkit";
+import axios from "axios";
+
+export const listMessages = createAsyncThunk('message/list', async (credentials?: {url?: string, episodeId?: number}) => {
+    const config = {
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `JWT ${localStorage.getItem('access')}`
+        }
+    }
+
+    const requestUrl = credentials?.url
+        ? credentials.url
+        : `${process.env.REACT_APP_API_URL}/api/episodes/${credentials?.episodeId}/messages/?page_size=5`
+
+    const response = await axios.get(requestUrl, config)
+    return response.data
+})
+
+export const updateMessageOrder = createAsyncThunk('message/order', async (credentials: {id: string, order: number}) => {
+    const config = {
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `JWT ${localStorage.getItem('access')}`
+        }
+    }
+
+    const data = {
+        order: credentials.order
+    }
+
+    const response = await axios.patch(`${process.env.REACT_APP_API_URL}/api/messages/${credentials.id}/order/`, data, config)
+    return response.data
+})

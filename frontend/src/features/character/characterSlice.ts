@@ -2,11 +2,7 @@ import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {createCharacter, deleteCharacter, listCharacters, updateCharacter} from "./characterThunk";
 import {createErrorsList} from "../../miscellaneous";
 
-type ErrorPayload = {
-    [key: string]: string[]
-}
-
-type Character = {
+export type Character = {
     id: number
     name: string
     story: number

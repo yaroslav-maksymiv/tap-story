@@ -72,6 +72,23 @@ class CharacterSerializer(serializers.ModelSerializer):
         model = Character
         fields = ['id', 'name', 'story', 'color']
 
+    def validate(self, data):
+        instance = self.instance
+        story = data.get('story', instance.story if instance else None)
+
+        name = data.get('name')
+        if name:
+            if Character.objects.filter(story=story, name=name).exists():
+                raise serializers.ValidationError("This name is already in use.")
+
+        color = data.get('color')
+        if color:
+            color = color.upper()
+            if Character.objects.filter(story=story, color=color).exists():
+                raise serializers.ValidationError("This color is already in use.")
+
+        return data
+
 
 class CommentSerializer(serializers.ModelSerializer):
     is_liked = serializers.SerializerMethodField(read_only=True)

@@ -7,6 +7,7 @@ import commentReducer from '../features/comment/commentSlice'
 import notificationReducer from '../features/notification/notificationSlice'
 import episodeReducer from '../features/episode/episodeSlice'
 import characterReducer from '../features/character/characterSlice'
+import messageReducer from '../features/message/messageSlice'
 
 const store = configureStore({
     reducer: {
@@ -17,6 +18,7 @@ const store = configureStore({
         notification: notificationReducer,
         episode: episodeReducer,
         character: characterReducer,
+        message: messageReducer
     }
 })
 

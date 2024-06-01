@@ -5,6 +5,7 @@ import {singleEpisode} from "./episodeThunk";
 import {Loading} from "../../components/Loading";
 import {singleStory} from "../story/storyThunks";
 import {CharactersMenu} from "../character/CharactersMenu";
+import {Messages} from "../message/Messages";
 
 export const Episode: React.FC = () => {
     const dispatch = useAppDispatch()
@@ -48,9 +49,14 @@ export const Episode: React.FC = () => {
             <div className="w-full flex gap-10">
                 <div className="w-3/5">
                     {episode && episodeVisible && (
-                        <div>
-                            <h1 className="text-4xl">Episode: {episode.title}</h1>
-                        </div>
+                        <>
+                            <div className="mb-8">
+                                <h1 className="text-4xl">Episode: {episode.title}</h1>
+                            </div>
+                            <div>
+                                <Messages episodeId={episode.id}/>
+                            </div>
+                        </>
                     )}
                     {infoText && (
                         <div className="text-xl flex justify-center items-center">{infoText}</div>
