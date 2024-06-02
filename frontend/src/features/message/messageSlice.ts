@@ -10,9 +10,9 @@ export type Message = {
     character: Character
     episode: number
     text_content: string
-    image_content: string | null
-    video_content: string | null
-    audio_content: string | null
+    image_content: string | null | File
+    video_content: string | null | File
+    audio_content: string | null | File
     status_content: string
 }
 
