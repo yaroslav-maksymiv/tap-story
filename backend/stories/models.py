@@ -136,4 +136,4 @@ class Message(Timestamp):
         ordering = ['order']
 
     def __str__(self):
-        return f'{self.character.name} - {self.message_type}'
+        return f'{self.character.name if self.character else "AUTHOR"} - {self.message_type}'

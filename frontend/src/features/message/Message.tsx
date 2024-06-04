@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
-import {Message} from "./messageSlice";
+import {Message, removeMessage} from "./messageSlice";
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
-import {updateMessage} from "./messageThunk";
+import {deleteMessage, updateMessage} from "./messageThunk";
 import {Loading} from "../../components/Loading";
 
 interface Props {
@@ -55,15 +55,34 @@ export const MessageSingle: React.FC<Props> = ({message}) => {
                 setLoading(false)
             }
         })
-        console.log(data, msg)
     }
 
     const cancelEdit = () => {
         setData(msg)
     }
 
+    const deleteMsg = () => {
+        dispatch(deleteMessage({id: msg.id})).then(response => {
+            if (deleteMessage.fulfilled.match(response)) {
+                dispatch(removeMessage(msg.id))
+            } else {
+                console.log('error deleting message ' + msg.id)
+            }
+        })
+    }
+
     return (
-        <div className="border-2 relative p-4 rounded-md bg-gray-800" style={{'borderColor': data.character.color}}>
+        <div className="msg border-2 relative p-4 rounded-md bg-gray-800"
+             style={{'borderColor': data.character ? data.character.color : '#ffffff'}}>
+            <div className="add-message hidden absolute z-5 -bottom-5 left-0 w-full justify-center">
+                <div className="cursor-pointer flex w-12 h-12 justify-center items-center bg-blue-600 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                         stroke-width="1.5" stroke="currentColor" className="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M12 4.5v15m7.5-7.5h-15"/>
+                    </svg>
+                </div>
+            </div>
             {loading && (
                 <div
                     className="absolute top-0 left-0 z-10 bg-blue-600 opacity-50 w-full h-full flex justify-center items-center">
@@ -73,6 +92,7 @@ export const MessageSingle: React.FC<Props> = ({message}) => {
             <div className="mb-2 flex justify-between">
                 <div className="text-lg">{data.message_type.toUpperCase()}</div>
                 <button
+                    onClick={() => deleteMsg()}
                     className="flex justify-center rounded-md px-2 py-1 text-sm font-semibold leading-6 text-red-600"
                 >
                     Delete
@@ -113,7 +133,7 @@ export const MessageSingle: React.FC<Props> = ({message}) => {
                 {data.message_type === 'image' && (
                     <>
                         <div className="flex items-center justify-center w-full">
-                            <label htmlFor="dropzone-file"
+                            <label htmlFor="dropzone-image"
                                    className="flex flex-col items-center justify-center w-full border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
                                 <div className="flex flex-col items-center justify-center pt-2 pb-3">
                                     <svg className="w-8 h-8 text-gray-500 dark:text-gray-400" aria-hidden="true"
@@ -124,9 +144,11 @@ export const MessageSingle: React.FC<Props> = ({message}) => {
                                     </svg>
                                     <p className="text-sm text-gray-500 dark:text-gray-400"><span
                                         className="font-semibold">Click to upload</span> or drag and drop</p>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">PNG, JPG</p>
                                 </div>
-                                <input onChange={e => handleChangeFile(e)} name="image_content" id="dropzone-file"
+                                <input onChange={e => handleChangeFile(e)} name="image_content" id="dropzone-image"
                                        type="file"
+                                       accept="image/jpeg, image/png"
                                        className="hidden"/>
                             </label>
                         </div>
@@ -136,6 +158,34 @@ export const MessageSingle: React.FC<Props> = ({message}) => {
                                  alt=""/>
                         )}
                     </>
+                )}
+                {data.message_type === 'audio' && (
+                    <div>
+                        <div className="flex items-center justify-center">
+                            <label htmlFor="dropzone-audio"
+                                   className="flex flex-col items-center justify-center w-full border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
+                                <div className="flex flex-col items-center justify-center pt-2 pb-3">
+                                    <svg className="w-8 h-8 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                              stroke-width="2"
+                                              d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+                                    </svg>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400"><span
+                                        className="font-semibold">Click to upload</span> or drag and drop</p>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">MP3, WAV, and OGG</p>
+                                </div>
+                                <input onChange={e => handleChangeFile(e)} name="audio_content" id="dropzone-audio"
+                                       type="file" accept="audio/*"
+                                       className="hidden"/>
+                            </label>
+                            <audio controls className="w-full ml-5">
+                                <source
+                                    src={data.audio_content instanceof File ? URL.createObjectURL(data.audio_content) : data.audio_content ? data.audio_content : ''}/>
+                                Your browser does not support the audio element.
+                            </audio>
+                        </div>
+                    </div>
                 )}
             </div>
             {data !== msg && (

@@ -205,7 +205,7 @@ export const updateStory = createAsyncThunk('story/update', async (credentials: 
             'Authorization': `JWT ${localStorage.getItem('access')}`
         }
     }
-
+    console.log(credentials.image)
     const data = new FormData()
     data.append('title', credentials.title)
     data.append('description', credentials.description)

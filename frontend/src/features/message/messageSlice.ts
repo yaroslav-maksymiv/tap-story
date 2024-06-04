@@ -56,6 +56,9 @@ const messageSlice = createSlice({
     reducers: {
         reorderMessage(state, action) {
             state.messages = action.payload
+        },
+        removeMessage(state, action) {
+            state.messages = state.messages.filter(message => message.id !== action.payload)
         }
     },
     extraReducers: (builder) => {
@@ -79,4 +82,4 @@ const messageSlice = createSlice({
 })
 
 export default messageSlice.reducer
-export const {reorderMessage} = messageSlice.actions
+export const {reorderMessage, removeMessage} = messageSlice.actions

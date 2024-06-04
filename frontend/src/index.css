@@ -9,3 +9,7 @@ body {
 .comment:hover .delete-icon {
     display: block;
 }
+
+.msg:hover .add-message {
+    display: flex;
+}

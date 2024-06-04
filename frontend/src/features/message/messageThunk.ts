@@ -45,33 +45,56 @@ export const updateMessageOrder = createAsyncThunk('message/order', async (crede
 export const updateMessage = createAsyncThunk('message/update', async (credentials: { message: Message }) => {
     const config = {
         headers: {
+            'Content-Type': 'multipart/form-data',
+            'Accept': 'application/json',
+            'Authorization': `JWT ${localStorage.getItem('access')}`
+        }
+    }
+
+    const msg = credentials.message
+    const data = new FormData()
+    if (msg.character) {
+        data.append('character', String(msg.character.id))
+    }
+    switch (msg.message_type) {
+        case 'image':
+            if (msg.image_content) {
+                data.append('image_content', msg.image_content)
+            }
+            break
+        case 'video':
+            if (msg.video_content) {
+                data.append('video_content', msg.video_content)
+            }
+            break
+        case 'audio':
+            if (msg.audio_content) {
+                data.append('audio_content', msg.audio_content)
+            }
+            break
+        case 'status':
+            data.append('status_content', msg.status_content)
+            break
+        case 'text':
+            data.append('text_content', msg.text_content)
+            break
+    }
+
+    const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/messages/${msg.id}/`, data, config)
+    return response.data
+})
+
+export const deleteMessage = createAsyncThunk('message/order', async (credentials: {
+    id: number
+}) => {
+    const config = {
+        headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
             'Authorization': `JWT ${localStorage.getItem('access')}`
         }
     }
 
-    const data = new FormData()
-    data.append('character', String(credentials.message.character.id))
-
-    switch (credentials.message.message_type) {
-        case 'image':
-            if (credentials.message.image_content) {
-                data.append('image_content', credentials.message.image_content)
-            }
-            break
-        case 'video':
-            break
-        case 'audio':
-            break
-        case 'status':
-            data.append('status_content', credentials.message.status_content)
-            break
-        case 'text':
-            data.append('text_content', credentials.message.text_content)
-            break
-    }
-
-    const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/messages/${credentials.message.id}/`, data, config)
+    const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/messages/${credentials.id}/`, config)
     return response.data
 })

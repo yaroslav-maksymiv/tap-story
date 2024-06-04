@@ -55,8 +55,12 @@ export const Messages: React.FC<Props> = ({episodeId}) => {
         })
     }
 
-    const addMessage = () => {
+    const addMessage = (id?: number) => {
+        if (id) {
 
+        } else {
+
+        }
     }
 
     return (
@@ -70,9 +74,10 @@ export const Messages: React.FC<Props> = ({episodeId}) => {
                     <DragDropContext onDragEnd={onDragEnd}>
                         <Droppable droppableId="messages">
                             {(provided) => (
-                                <div className="flex flex-col gap-5" {...provided.droppableProps}
+                                <div className="flex flex-col gap-7" {...provided.droppableProps}
                                      ref={provided.innerRef}>
                                     <div
+                                        onClick={() => addMessage}
                                         className="cursor-pointer p-3 border bg-gray-900 rounded-md text-lg flex flex-col items-center text-sm gap-1">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                              stroke-width="1.5" stroke="currentColor" className="w-10 h-10">
@@ -80,6 +85,9 @@ export const Messages: React.FC<Props> = ({episodeId}) => {
                                                   d="M12 4.5v15m7.5-7.5h-15"/>
                                         </svg>
                                         Add Message
+                                    </div>
+                                    <div className="">
+
                                     </div>
                                     {messages.map((message, index) => (
                                         <Draggable key={message.id} draggableId={message.id.toString()} index={index}>
@@ -89,7 +97,7 @@ export const Messages: React.FC<Props> = ({episodeId}) => {
                                                     {...provided.draggableProps}
                                                     {...provided.dragHandleProps}
                                                 >
-                                                    <MessageSingle message={message} />
+                                                    <MessageSingle message={message}/>
                                                 </div>
                                             )}
                                         </Draggable>

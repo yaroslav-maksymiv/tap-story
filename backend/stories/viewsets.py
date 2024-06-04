@@ -465,6 +465,7 @@ class MessageViewSet(ModelViewSet):
                 'video': 'video_content',
                 'audio': 'audio_content'
             }.get(message_type)
+
             update_data = {
                 message_content: data.get(message_content)
             }
