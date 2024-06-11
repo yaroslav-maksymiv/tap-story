@@ -1,7 +1,7 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {Character} from "../character/characterSlice";
 import {PaginatedResponse} from "../../types";
-import {listMessages} from "./messageThunk";
+import {createMessage, listMessages} from "./messageThunk";
 
 export type Message = {
     id: number
@@ -26,6 +26,7 @@ type MessageState = {
     loading: {
         update: boolean
         list: boolean
+        create: boolean
     }
     errors: {
         update: string
@@ -46,7 +47,8 @@ const initialState: MessageState = {
     },
     loading: {
         update: false,
-        list: false
+        list: false,
+        create: false
     }
 }
 
@@ -67,7 +69,12 @@ const messageSlice = createSlice({
         })
         builder.addCase(listMessages.fulfilled, (state, action: PayloadAction<PaginatedResponse<Message>>) => {
             const payload = action.payload
-            state.messages = [...state.messages, ...payload.results]
+            const loadMore = action.payload.loadMore
+            if (loadMore) {
+                state.messages = [...state.messages, ...payload.results]
+            } else {
+                state.messages = payload.results
+            }
             state.loading.list = false
             state.total = payload.total
             state.page = payload.page
@@ -77,6 +84,22 @@ const messageSlice = createSlice({
         })
         builder.addCase(listMessages.rejected, (state) => {
             state.loading.list = false
+        })
+        builder.addCase(createMessage.pending, (state) => {
+            state.loading.create = true
+        })
+        builder.addCase(createMessage.fulfilled, (state, action: PayloadAction<Message>) => {
+            let messages = state.messages
+            let insertIndex = messages.findIndex(message => message.order > action.payload.order)
+            if (insertIndex === -1) {
+                insertIndex = messages.length
+            }
+            messages.splice(insertIndex, 0, action.payload)
+            state.messages = messages
+            state.loading.create = false
+        })
+        builder.addCase(createMessage.rejected, (state) => {
+            state.loading.create = false
         })
     }
 })

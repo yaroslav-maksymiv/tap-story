@@ -5,6 +5,7 @@ import {removeFromSaved, saveStory, singleStory, toggleLikeStory} from "./storyT
 import {Loading} from "../../components/Loading";
 import {Comments} from "../comment/Comments";
 import Popup from 'reactjs-popup';
+import {StoryContent} from "./StoryContent";
 
 export const Story: React.FC = () => {
     const dispatch = useAppDispatch()
@@ -149,7 +150,7 @@ export const Story: React.FC = () => {
                             </button>
 
                             <Popup open={storyTabOpened} closeOnDocumentClick onClose={() => setStoryTabOpened(false)}>
-                                <div style={{'backgroundColor': 'rgba(0, 0, 40, 0.6)'}}
+                                <div style={{'backgroundColor': 'rgba(0, 0, 1, 0.8)'}}
                                      className="w-screen h-screen px-20 py-10 flex justify-center items-center relative">
                                     <div className="absolute top-10 right-10 text-white " onClick={() => setStoryTabOpened(false)}>
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -158,11 +159,8 @@ export const Story: React.FC = () => {
                                                   d="M6 18 18 6M6 6l12 12"/>
                                         </svg>
                                     </div>
-                                    <div className="modal w-1/3 h-full bg-gray-800 rounded-md">
-                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Beatae magni
-                                        omnis delectus nemo, maxime molestiae dolorem numquam mollitia, voluptate
-                                        ea, accusamus excepturi deleniti ratione sapiente! Laudantium, aperiam
-                                        doloribus. Odit, aut.
+                                    <div className="relative modal w-1/3 h-full bg-gray-900 rounded-md py-12 px-5">
+                                        <StoryContent />
                                     </div>
                                 </div>
                             </Popup>

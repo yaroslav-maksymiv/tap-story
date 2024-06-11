@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 
-from .validators import validate_hex_color
+from .validators import validate_hex_color, image_extension_validator, audio_extension_validator, video_extension_validator
 
 User = get_user_model()
 
@@ -123,13 +123,13 @@ class Message(Timestamp):
 
     episode = models.ForeignKey(Episode, related_name='messages', on_delete=models.CASCADE)
     character = models.ForeignKey(Character, related_name='messages', on_delete=models.SET_NULL, null=True, blank=True)
-    order = models.FloatField(unique=True)
+    order = models.FloatField()
     message_type = models.CharField(max_length=20, choices=MESSAGE_TYPES, default='text')
 
     text_content = models.TextField(max_length=200, blank=True, default='')
-    image_content = models.ImageField(upload_to='message_images', blank=True, null=True)
-    video_content = models.FileField(upload_to='message_videos', blank=True, null=True)
-    audio_content = models.FileField(upload_to='message_audios', blank=True, null=True)
+    image_content = models.ImageField(upload_to='message_images', validators=[image_extension_validator], blank=True, null=True)
+    video_content = models.FileField(upload_to='message_videos', validators=[video_extension_validator], blank=True, null=True)
+    audio_content = models.FileField(upload_to='message_audios', validators=[audio_extension_validator], blank=True, null=True)
     status_content = models.CharField(max_length=255, blank=True, default='')
 
     class Meta:

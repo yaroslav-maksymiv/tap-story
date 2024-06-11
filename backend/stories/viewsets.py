@@ -47,12 +47,12 @@ def destroy_by_story_pk(pk, user, queryset):
     return False
 
 
-def validate_unique_order(order, queryset):
+def validate_unique_order(order, episode, queryset):
     if order:
         try:
             order = float(order)
             if order > 0:
-                if queryset.filter(order=order).exists():
+                if queryset.filter(order=order, episode=episode).exists():
                     raise ValidationError("Instance with this order already exists.")
                 else:
                     return order
@@ -408,7 +408,7 @@ class MessageViewSet(ModelViewSet):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
         try:
-            order = validate_unique_order(data.get('order'), Message.objects.filter(episode=episode))
+            order = validate_unique_order(data.get('order'), episode, Message.objects.filter(episode=episode))
         except ValidationError as err:
             return Response({'message': str(err.messages[0])}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -498,7 +498,7 @@ class MessageViewSet(ModelViewSet):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
         try:
-            order = validate_unique_order(request.data.get('order'), Message.objects.filter(episode=message.episode))
+            order = validate_unique_order(request.data.get('order'), message.episode, Message.objects.filter(episode=message.episode))
         except ValidationError as err:
             return Response({'message': str(err.messages[0])}, status=status.HTTP_400_BAD_REQUEST)
 

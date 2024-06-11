@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
 import {listMessages, updateMessageOrder} from "./messageThunk";
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -6,6 +6,7 @@ import {Loading} from "../../components/Loading";
 import {DragDropContext, Droppable, Draggable} from 'react-beautiful-dnd'
 import {reorderMessage} from "./messageSlice";
 import {MessageSingle} from "./Message";
+import {MessageAddMenu} from "./MessageAddMenu";
 
 interface Props {
     episodeId: number
@@ -15,6 +16,8 @@ export const Messages: React.FC<Props> = ({episodeId}) => {
     const dispatch = useAppDispatch()
 
     const {messages, hasMore, nextLink, loading} = useAppSelector(state => state.message)
+
+    const [addPageMenu, setAddPageMenu] = useState<number | null>(null)
 
     useEffect(() => {
         dispatch(listMessages({episodeId}))
@@ -59,13 +62,29 @@ export const Messages: React.FC<Props> = ({episodeId}) => {
         if (id) {
 
         } else {
-
+            setAddPageMenu(-1)
         }
     }
 
     return (
         <div className="">
-            {messages?.length > 0 && (
+            <div
+                onClick={() => addMessage()}
+                className="cursor-pointer p-3 border bg-gray-900 rounded-md text-lg flex flex-col items-center text-sm gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                     stroke-width="1.5" stroke="currentColor" className="w-10 h-10">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M12 4.5v15m7.5-7.5h-15"/>
+                </svg>
+                Add Message
+            </div>
+            {addPageMenu === -1 && (
+                <div className="mt-4">
+                    <MessageAddMenu episodeId={episodeId} addPageMenu={addPageMenu} setAddPageMenu={setAddPageMenu} />
+                </div>
+            )}
+
+            {messages?.length > 0 ? (
                 <InfiniteScroll next={fetchMoreData} hasMore={hasMore} dataLength={messages.length} loader={(
                     <div className="w-full py-10 flex justify-center">
                         <Loading size={40}/>
@@ -76,16 +95,6 @@ export const Messages: React.FC<Props> = ({episodeId}) => {
                             {(provided) => (
                                 <div className="flex flex-col gap-7" {...provided.droppableProps}
                                      ref={provided.innerRef}>
-                                    <div
-                                        onClick={() => addMessage}
-                                        className="cursor-pointer p-3 border bg-gray-900 rounded-md text-lg flex flex-col items-center text-sm gap-1">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                             stroke-width="1.5" stroke="currentColor" className="w-10 h-10">
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                  d="M12 4.5v15m7.5-7.5h-15"/>
-                                        </svg>
-                                        Add Message
-                                    </div>
                                     <div className="">
 
                                     </div>
@@ -97,7 +106,7 @@ export const Messages: React.FC<Props> = ({episodeId}) => {
                                                     {...provided.draggableProps}
                                                     {...provided.dragHandleProps}
                                                 >
-                                                    <MessageSingle message={message}/>
+                                                    <MessageSingle episodeId={episodeId} setAddPageMenu={setAddPageMenu} addPageMenu={addPageMenu} message={message}/>
                                                 </div>
                                             )}
                                         </Draggable>
@@ -108,7 +117,7 @@ export const Messages: React.FC<Props> = ({episodeId}) => {
                         </Droppable>
                     </DragDropContext>
                 </InfiniteScroll>
-            )}
+            ) : <div className="my-3">No messages yet</div>}
         </div>
     )
 }
