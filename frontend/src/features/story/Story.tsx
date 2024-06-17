@@ -21,6 +21,14 @@ export const Story: React.FC = () => {
     const [storyTabOpened, setStoryTabOpened] = useState<boolean>(false)
 
     useEffect(() => {
+        if (storyTabOpened) {
+            document.body.style.overflow = 'hidden'
+        } else {
+            document.body.style.overflow = 'visible'
+        }
+    }, [storyTabOpened])
+
+    useEffect(() => {
         if (id) {
             dispatch(singleStory({id}))
         }
@@ -59,6 +67,15 @@ export const Story: React.FC = () => {
                 navigate(`/login?redirect=story/${story.id}`)
             }
         }
+    }
+
+    const storyRead = () => {
+        if (!isAuthenticated) {
+            if (story) {
+                navigate(`/login?redirect=story/${story.id}`)
+            }
+        }
+        setStoryTabOpened(true)
     }
 
     return (
@@ -144,7 +161,7 @@ export const Story: React.FC = () => {
                                 </div>
                             </div>
                             <button
-                                onClick={() => setStoryTabOpened(true)}
+                                onClick={() => storyRead()}
                                 className="btn mt-5 max-w-96 flex w-full justify-center rounded-md bg-blue-600 px-24 py-2 text-lg font-semibold leading-6 text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
                                 Read
                             </button>
@@ -152,15 +169,17 @@ export const Story: React.FC = () => {
                             <Popup open={storyTabOpened} closeOnDocumentClick onClose={() => setStoryTabOpened(false)}>
                                 <div style={{'backgroundColor': 'rgba(0, 0, 1, 0.8)'}}
                                      className="w-screen h-screen px-20 py-10 flex justify-center items-center relative">
-                                    <div className="absolute top-10 right-10 text-white " onClick={() => setStoryTabOpened(false)}>
+                                    <div className="absolute top-10 right-10 text-white "
+                                         onClick={() => setStoryTabOpened(false)}>
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                             stroke-width="1.5" stroke="currentColor" className="w-10 h-10 cursor-pointer">
+                                             stroke-width="1.5" stroke="currentColor"
+                                             className="w-10 h-10 cursor-pointer">
                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                   d="M6 18 18 6M6 6l12 12"/>
                                         </svg>
                                     </div>
-                                    <div className="relative modal w-1/3 h-full bg-gray-900 rounded-md py-12 px-5">
-                                        <StoryContent />
+                                    <div className="relative modal w-1/3 h-full bg-gray-900 rounded-md p-4">
+                                        <StoryContent/>
                                     </div>
                                 </div>
                             </Popup>

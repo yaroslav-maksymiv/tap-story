@@ -119,9 +119,9 @@ export const Navbar: React.FC = () => {
                                 {user && menuVisible && (
                                     <div
                                         className="menu text-white w-52 absolute top-14 right-0 bg-gray-800 px-2 py-3 rounded-md flex flex-col gap-2">
-                                        <Link to={`/profile/${user.id}`}>
-                                            <div className="hover:bg-gray-700 px-1 rounded-md">Profile</div>
-                                        </Link>
+                                        {/*<Link to={`/profile/${user.id}`}>*/}
+                                        {/*    <div className="hover:bg-gray-700 px-1 rounded-md">Profile</div>*/}
+                                        {/*</Link>*/}
                                         <Link to={'/my/stories'}>
                                             <div className="hover:bg-gray-700 px-1 rounded-md">My Stories</div>
                                         </Link>
@@ -163,18 +163,13 @@ export const Navbar: React.FC = () => {
                         <ul className="flex flex-col mt-4 font-medium lg:flex-row lg:space-x-8 lg:mt-0">
                             <li><Link to={'/'}
                                       className="block py-2 pr-4 pl-3 text-white rounded bg-primary-700 lg:bg-transparent lg:text-primary-700 lg:p-0 dark:text-white"
-                                      aria-current="page">Search 🔎</Link></li>
+                                      aria-current="page">Stories 👻</Link></li>
                             <li>
                                 <div
                                     onClick={() => getRandomStory()}
                                     className="cursor-pointer block py-2 pr-4 pl-3 text-white rounded bg-primary-700 lg:bg-transparent lg:text-primary-700 lg:p-0 dark:text-white"
                                     aria-current="page">Random Story 🎲
                                 </div>
-                            </li>
-                              <li>
-                                <Link to={'/home'}
-                                      className="block py-2 pr-4 pl-3 text-white rounded bg-primary-700 lg:bg-transparent lg:text-primary-700 lg:p-0 dark:text-white"
-                                      aria-current="page">About 💻</Link>
                             </li>
                         </ul>
                     </div>

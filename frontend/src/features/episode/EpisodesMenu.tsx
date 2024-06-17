@@ -43,7 +43,7 @@ export const EpisodesMenu: React.FC<Props> = ({storyId}) => {
                         <Loading/>
                     </div>
                 ) : episodes.length > 0 ? episodes.map((episode) => (
-                    <div key={episode.id} className="bg-gray-900 p-2 rounded-md">
+                    <div key={episode.id} className="bg-gray-900 p-2 rounded-md mb-2">
                         <Link to={`/episode/${episode.id}/edit`}>
                             <div className="mb-1 font-bold">{episode.title}</div>
                         </Link>

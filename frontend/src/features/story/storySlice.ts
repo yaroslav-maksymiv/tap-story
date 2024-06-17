@@ -5,13 +5,14 @@ import {
     listLikedStories,
     listMyStories,
     listSavedStories,
-    listStories,
+    listStories, listStoryMessages,
     singleStory,
     toggleLikeStory
 } from "./storyThunks";
 import {PaginatedResponse} from "../../types";
 import {savePaginatedResponseToState} from "../../miscellaneous";
 import {Story} from "./Story";
+import {Message} from "../message/messageSlice";
 
 export type Story = {
     id: number
@@ -27,6 +28,15 @@ export type Story = {
     is_saved: boolean
 }
 
+type Messages = {
+    list: Message[],
+    nextLink: string | null
+    hasMore: boolean
+    loading: boolean
+    error: string
+    page: number
+}
+
 type StoryState = {
     loading: boolean
     stories: Story[]
@@ -36,6 +46,7 @@ type StoryState = {
     previousLink: string | null
     story: Story | null
     hasMore: boolean
+    messages: Messages
 }
 
 const initialState: StoryState = {
@@ -46,7 +57,15 @@ const initialState: StoryState = {
     nextLink: null,
     previousLink: null,
     story: null,
-    hasMore: true
+    hasMore: true,
+    messages: {
+        list: [],
+        loading: false,
+        hasMore: true,
+        error: '',
+        nextLink: null,
+        page: 1
+    }
 }
 
 const storySlice = createSlice({
@@ -115,6 +134,25 @@ const storySlice = createSlice({
         builder.addCase(listMyStories.rejected, (state) => {
             state.loading = false
             state.stories = []
+        })
+        builder.addCase(listStoryMessages.pending, (state) => {
+            state.messages.loading = true
+        })
+        builder.addCase(listStoryMessages.fulfilled, (state, action: PayloadAction<PaginatedResponse<Message>>) => {
+            const payload = action.payload
+            const loadMore = action.payload.loadMore
+            if (loadMore) {
+                state.messages.list = [...state.messages.list, ...payload.results]
+            } else {
+                state.messages.list = payload.results
+            }
+            state.messages.loading = false
+            state.messages.nextLink = payload.links.next
+            state.messages.hasMore = !!payload.links.next
+            state.messages.page = payload.page
+        })
+        builder.addCase(listStoryMessages.rejected, (state) => {
+            state.messages.loading = false
         })
     }
 })

@@ -19,7 +19,7 @@ from .serializers import (
     CharacterSerializer, SavedStorySerializer, EpisodeSerializer,
     MessageSerializer
 )
-from .pagination import MyPagePagination
+from .pagination import MyPagePagination, FixedPagePagination
 from authentication.serializers import (
     UserAccountSerializer, Notification
 )
@@ -96,6 +96,7 @@ class StoryViewSet(ModelViewSet):
 
         serializer = self.get_serializer(story, context={'request': request})
         return Response(serializer.data)
+
 
     def create(self, request, *args, **kwargs):
         user = request.user
@@ -390,9 +391,10 @@ class EpisodeViewSet(ModelViewSet):
     def get_messages(self, request, pk=None):
         episode = get_object_or_404(Episode, pk=pk)
         queryset = episode.messages.all().order_by('order')
-        queryset = self.paginate_queryset(queryset)
+        paginator = FixedPagePagination()
+        queryset = paginator.paginate_queryset(queryset, request, view=self)
         serializer = MessageSerializer(queryset, many=True, context={'request': request})
-        return self.get_paginated_response(serializer.data)
+        return paginator.get_paginated_response(serializer.data)
 
 
 class MessageViewSet(ModelViewSet):

@@ -31,7 +31,7 @@ export const StoriesSearch: React.FC = () => {
         <div className="py-28 text-white">
             <h1 className="text-4xl font-bold">Search</h1>
 
-            <div className="text-white mt-6 mb-2">
+            <div className="text-white mt-6 mb-3">
                 <div className="relative mt-2 rounded-md shadow-sm">
                     <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                         <span className="text-gray-500 sm:text-sm">🔎</span>
@@ -48,22 +48,27 @@ export const StoriesSearch: React.FC = () => {
                 </div>
             </div>
 
-            <div className="mb-2">
-                <Categories category={category} setCategory={setCategory}/>
-            </div>
-            <div className="mb-10">
-                <select id="order" name="order" onChange={e => setOrderBy(e.target.value)} required
-                        className="bg-gray-800 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-40 p-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                    <option value={'-created_at'}>Newest</option>
-                    <option value={'created_at'}>Oldest</option>
-                    <option value={'-likes_count'}>Most Likes</option>
-                </select>
+            <div className="flex gap-10 mb-4 justify-between">
+                <div className="mb-2">
+                    <div className="text-lg mb-1">Categories</div>
+                    <Categories category={category} setCategory={setCategory}/>
+                </div>
+                <div className="mb-10">
+                    <div className="text-lg mb-1">Order by</div>
+                    <select id="order" name="order" onChange={e => setOrderBy(e.target.value)} required
+                            className="bg-gray-800 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-40 p-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                        <option value={'-created_at'}>Newest</option>
+                        <option value={'created_at'}>Oldest</option>
+                        <option value={'-likes_count'}>Most Likes</option>
+                    </select>
+                </div>
             </div>
 
             {stories?.length > 0 ? (
-                <InfiniteScroll next={fetchMoreData} hasMore={hasMore} loader={<div className="w-full py-10 flex justify-center">
-                    <Loading size={50}/>
-                </div>}
+                <InfiniteScroll next={fetchMoreData} hasMore={hasMore}
+                                loader={<div className="w-full py-10 flex justify-center">
+                                    <Loading size={50}/>
+                                </div>}
                                 dataLength={stories.length}>
                     <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
                         {stories.map((story) => (

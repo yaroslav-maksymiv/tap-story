@@ -2,7 +2,12 @@ import {createAsyncThunk} from "@reduxjs/toolkit";
 import axios from "axios";
 import {ConfigType} from "../../types";
 
-export const listStories = createAsyncThunk('story/list', async (credentials?: {url?: string, category?: number | null, search?: string, orderBy?: string}) => {
+export const listStories = createAsyncThunk('story/list', async (credentials?: {
+    url?: string,
+    category?: number | null,
+    search?: string,
+    orderBy?: string
+}) => {
     const config = {
         headers: {
             'Content-Type': 'application/json',
@@ -205,7 +210,7 @@ export const updateStory = createAsyncThunk('story/update', async (credentials: 
             'Authorization': `JWT ${localStorage.getItem('access')}`
         }
     }
-    console.log(credentials.image)
+
     const data = new FormData()
     data.append('title', credentials.title)
     data.append('description', credentials.description)
@@ -231,5 +236,28 @@ export const randomStory = createAsyncThunk('story/random', async () => {
     }
 
     const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/stories/random`, config)
+    return response.data
+})
+
+export const listStoryMessages = createAsyncThunk('story/messages', async (credentials: {
+    url?: string,
+    episodeId?: number
+    page?: number
+}) => {
+    const config = {
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        }
+    }
+
+    const requestUrl = credentials.url
+        ? credentials.url
+        : `${process.env.REACT_APP_API_URL}/api/episodes/${credentials.episodeId}/messages/${credentials.page ? `?page=${credentials.page}` : ''}`
+
+    const response = await axios.get(requestUrl, config)
+    if (credentials.url) {
+        response.data['loadMore'] = true
+    }
     return response.data
 })
