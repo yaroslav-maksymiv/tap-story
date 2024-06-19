@@ -20,7 +20,8 @@ export const Register: React.FC = () => {
     const {
         isAuthenticated,
         isRegistered,
-        registerLoading
+        registerLoading,
+        registerErrors
     } = useAppSelector(state => state.authentication)
 
     const [errorMessages, setErrorMessages] = useState<string[]>([])
@@ -30,6 +31,12 @@ export const Register: React.FC = () => {
         rePassword: '',
         username: ''
     })
+
+    useEffect(() => {
+        if (registerErrors) {
+            setErrorMessages(registerErrors)
+        }
+    }, [registerErrors])
 
     const validateForm = () => {
         const errors = []
@@ -77,7 +84,7 @@ export const Register: React.FC = () => {
         if (isAuthenticated) {
             navigate('/')
         } else if (isRegistered) {
-            toast('You have successfully registered!', {
+            toast('You have successfully registered! Please activate your account!', {
                 position: "top-right",
                 autoClose: 2000,
                 hideProgressBar: false,
@@ -112,7 +119,9 @@ export const Register: React.FC = () => {
                 <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
                     {errorMessages && (
                         <div className="mb-4">
-                            {errorMessages.map((error: string) => <div className="mb-1"><ErrorAlert text={error} setErrors={setErrorMessages}/></div>)}
+                            {errorMessages.map((error: string) => <div className="mb-1"><ErrorAlert text={error}
+                                                                                                    setErrors={setErrorMessages}/>
+                            </div>)}
                         </div>
                     )}
                     <form className="space-y-6">

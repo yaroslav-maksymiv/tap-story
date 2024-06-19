@@ -14,13 +14,19 @@ export const Login: React.FC = () => {
     const dispatch = useAppDispatch()
     const navigate = useNavigate()
 
-    const {isAuthenticated, loginLoading} = useAppSelector(state => state.authentication)
+    const {isAuthenticated, loginLoading, loginErrors} = useAppSelector(state => state.authentication)
 
     const [errorMessages, setErrorMessages] = useState<string[]>([])
     const [formData, setFormData] = useState<FormData>({
         email: '',
         password: ''
     })
+
+    useEffect(() => {
+        if (loginErrors) {
+            setErrorMessages(loginErrors)
+        }
+    }, [loginErrors])
 
     const validateForm = () => {
         const errors = []

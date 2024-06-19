@@ -11,7 +11,7 @@ export const StoryContent: React.FC = () => {
     const [visibleMessages, setVisibleMessages] = useState<Message[]>([])
     const [currentMsgIndex, setCurrentMsgIndex] = useState<number>(0)
     const [episodeEnd, setEpisodeEnd] = useState<boolean>(false)
-    const [episodeId, setEpisodeId] = useState<number>(5)
+    const [episodeId, setEpisodeId] = useState<number>()
     const [nextEpisodeId, setNextEpisodeId] = useState<number | null>(null)
     const containerRef = useRef<HTMLDivElement>(null)
 
@@ -23,6 +23,12 @@ export const StoryContent: React.FC = () => {
             dispatch(listEpisodes({storyId: story.id}))
         }
     }, [])
+
+    useEffect(() => {
+        if (episodes && episodes.length > 0) {
+            setEpisodeId(episodes[0].id)
+        }
+    }, [episodes])
 
     useEffect(() => {
         dispatch(listStoryMessages({episodeId: episodeId, page: 2}))
@@ -93,8 +99,11 @@ export const StoryContent: React.FC = () => {
             <div
                 className="mb-3 text-2xl text-center absolute w-full bg-gray-800 left-0 top-0 py-2">{story?.title}</div>
             <div className="pt-16 overflow-auto h-full px-2 pb-5 flex flex-col gap-3" ref={containerRef}>
-                {visibleMessages.length === 0 && (
+                {visibleMessages.length === 0 && episodeId && (
                     <div className="text-center w-full text-xl">Press "Enter" to start</div>
+                )}
+                {!episodeId && (
+                    <div className="text-center w-full text-xl">Story is empty for now</div>
                 )}
                 {visibleMessages.map((msg) => (
                     <StoryMessage message={msg}/>
