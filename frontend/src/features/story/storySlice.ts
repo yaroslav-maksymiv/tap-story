@@ -71,7 +71,11 @@ const initialState: StoryState = {
 const storySlice = createSlice({
     name: 'story',
     initialState,
-    reducers: {},
+    reducers: {
+        resetMessages(state) {
+            state.messages.list = []
+        }
+    },
     extraReducers: (builder) => {
         builder.addCase(listStories.pending, (state) => {
             state.loading = true
@@ -140,21 +144,25 @@ const storySlice = createSlice({
         })
         builder.addCase(listStoryMessages.fulfilled, (state, action: PayloadAction<PaginatedResponse<Message>>) => {
             const payload = action.payload
-            const loadMore = action.payload.loadMore
-            if (loadMore) {
-                state.messages.list = [...state.messages.list, ...payload.results]
-            } else {
-                state.messages.list = payload.results
-            }
             state.messages.loading = false
-            state.messages.nextLink = payload.links.next
-            state.messages.hasMore = !!payload.links.next
-            state.messages.page = payload.page
+            if (payload.save) {
+                const loadMore = payload.loadMore
+                if (loadMore) {
+                    state.messages.list = [...state.messages.list, ...payload.results]
+                } else {
+                    state.messages.list = payload.results
+                }
+                state.messages.nextLink = payload.links.next
+                state.messages.hasMore = !!payload.links.next
+                state.messages.page = payload.page
+            }
         })
         builder.addCase(listStoryMessages.rejected, (state) => {
             state.messages.loading = false
+            state.messages.list = []
         })
     }
 })
 
 export default storySlice.reducer
+export const {resetMessages} = storySlice.actions

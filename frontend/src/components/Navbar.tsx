@@ -118,7 +118,7 @@ export const Navbar: React.FC = () => {
                                 </div>
                                 {user && menuVisible && (
                                     <div
-                                        className="menu text-white w-52 absolute top-14 right-0 bg-gray-800 px-2 py-3 rounded-md flex flex-col gap-2">
+                                        className="menu shadow-lg text-white w-52 absolute top-14 right-0 bg-gray-900 px-2 py-3 rounded-md flex flex-col gap-2">
                                         {/*<Link to={`/profile/${user.id}`}>*/}
                                         {/*    <div className="hover:bg-gray-700 px-1 rounded-md">Profile</div>*/}
                                         {/*</Link>*/}

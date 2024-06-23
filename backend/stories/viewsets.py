@@ -97,7 +97,6 @@ class StoryViewSet(ModelViewSet):
         serializer = self.get_serializer(story, context={'request': request})
         return Response(serializer.data)
 
-
     def create(self, request, *args, **kwargs):
         user = request.user
 

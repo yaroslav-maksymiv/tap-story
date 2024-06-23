@@ -93,7 +93,7 @@ export const Story: React.FC = () => {
                             <img
                                 src={story.image ? story.image : 'https://st4.depositphotos.com/14953852/24787/v/450/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg'}
                                 alt=""
-                                className="rounded-md w-full h-full object-cover"
+                                className="rounded-md w-full h-96 object-cover"
                             />
                         </div>
                         <div className="w-3/5">
@@ -107,20 +107,11 @@ export const Story: React.FC = () => {
                             <div className="mt-5 flex gap-3 text-sm font-medium text-gray-400">
                                 <div className="text-lg flex items-center gap-0.5 cursor-pointer">
                                     <div>{story.likes_count}</div>
-                                    <div onClick={() => likeStory(story.id)}>
-                                        {isLiked ? (
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                                                 fill="currentColor"
-                                                 className="w-7 h-7 text-red-500">
-                                                <path
-                                                    d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z"/>
-                                            </svg>
-                                        ) : (<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                  strokeWidth="1.5" stroke="currentColor" className="w-7 h-7">
-                                            <path strokeLinecap="round" strokeLinejoin="round"
-                                                  d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
-                                        </svg>)}
-                                    </div>
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                         strokeWidth="1.5" stroke="currentColor" className="w-7 h-7">
+                                        <path strokeLinecap="round" strokeLinejoin="round"
+                                              d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
+                                    </svg>
                                 </div>
                                 <div className="text-lg flex items-center gap-1">
                                     {story.views}
@@ -160,11 +151,27 @@ export const Story: React.FC = () => {
 
                                 </div>
                             </div>
-                            <button
-                                onClick={() => storyRead()}
-                                className="btn mt-5 max-w-96 flex w-full justify-center rounded-md bg-blue-600 px-24 py-2 text-lg font-semibold leading-6 text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-                                Read
-                            </button>
+                            <div className="flex items-center mt-5">
+                                <button
+                                    onClick={() => storyRead()}
+                                    className="btn max-w-80 flex w-full justify-center rounded-md bg-blue-600 px-24 py-2 text-lg font-semibold leading-6 text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                                    Read
+                                </button>
+                                <div className="cursor-pointer ml-5" onClick={() => likeStory(story.id)}>
+                                    {isLiked ? (
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                             fill="currentColor"
+                                             className="w-9 h-9 text-red-500">
+                                            <path
+                                                d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z"/>
+                                        </svg>
+                                    ) : (<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                              strokeWidth="1.5" stroke="currentColor" className="w-9 h-9">
+                                        <path strokeLinecap="round" strokeLinejoin="round"
+                                              d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
+                                    </svg>)}
+                                </div>
+                            </div>
 
                             <Popup open={storyTabOpened} closeOnDocumentClick onClose={() => setStoryTabOpened(false)}>
                                 <div style={{'backgroundColor': 'rgba(0, 0, 1, 0.8)'}}

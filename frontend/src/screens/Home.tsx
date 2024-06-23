@@ -1,6 +1,5 @@
 import React from "react";
 import {Link} from "react-router-dom";
-import {StoriesList} from "../features/story/StoriesList";
 
 export const Home: React.FC = () => {
     return (
@@ -12,7 +11,6 @@ export const Home: React.FC = () => {
                         <h2 className="text-2xl font-bold tracking-tight">Horrors</h2>
 
                         <div className="mt-6">
-                            <StoriesList />
                         </div>
                     </div>
                 </div>

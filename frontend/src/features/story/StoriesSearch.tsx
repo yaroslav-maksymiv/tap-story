@@ -10,7 +10,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 export const StoriesSearch: React.FC = () => {
     const dispatch = useAppDispatch()
 
-    const {stories, nextLink, hasMore} = useAppSelector(state => state.story)
+    const {stories, nextLink, hasMore, loading} = useAppSelector(state => state.story)
 
     const [searchText, setSearchText] = useState<string>('')
     const [orderBy, setOrderBy] = useState<string>('-created_at')
@@ -64,7 +64,12 @@ export const StoriesSearch: React.FC = () => {
                 </div>
             </div>
 
-            {stories?.length > 0 ? (
+            {loading && (
+                <div className="w-full h-full flex justify-center items-center">
+                    <Loading size={50}/>
+                </div>
+            )}
+            {stories?.length > 0 && (
                 <InfiniteScroll next={fetchMoreData} hasMore={hasMore}
                                 loader={<div className="w-full py-10 flex justify-center">
                                     <Loading size={50}/>
@@ -117,7 +122,7 @@ export const StoriesSearch: React.FC = () => {
                         ))}
                     </div>
                 </InfiniteScroll>
-            ) : (<div className="text-gray-400">No stories yet.</div>)}
+            )}
 
         </div>
     )

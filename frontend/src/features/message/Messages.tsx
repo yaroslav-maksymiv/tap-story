@@ -68,21 +68,24 @@ export const Messages: React.FC<Props> = ({episodeId}) => {
 
     return (
         <div className="">
-            <div
-                onClick={() => addMessage()}
-                className="cursor-pointer p-3 border bg-gray-900 rounded-md text-lg flex flex-col items-center text-sm gap-1">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                     stroke-width="1.5" stroke="currentColor" className="w-10 h-10">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                          d="M12 4.5v15m7.5-7.5h-15"/>
-                </svg>
-                Add Message
-            </div>
-            {addPageMenu === -1 && (
-                <div className="mt-4">
-                    <MessageAddMenu episodeId={episodeId} addPageMenu={addPageMenu} setAddPageMenu={setAddPageMenu} />
+            <div className="mb-4">
+                <div
+                    onClick={() => addMessage()}
+                    className="cursor-pointer p-3 border bg-gray-900 rounded-md text-lg flex flex-col items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                         stroke-width="1.5" stroke="currentColor" className="w-10 h-10">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M12 4.5v15m7.5-7.5h-15"/>
+                    </svg>
+                    Add Message
                 </div>
-            )}
+                {addPageMenu === -1 && (
+                    <div className="mt-4">
+                        <MessageAddMenu episodeId={episodeId} addPageMenu={addPageMenu}
+                                        setAddPageMenu={setAddPageMenu}/>
+                    </div>
+                )}
+            </div>
 
             {messages?.length > 0 ? (
                 <InfiniteScroll next={fetchMoreData} hasMore={hasMore} dataLength={messages.length} loader={(
@@ -93,7 +96,7 @@ export const Messages: React.FC<Props> = ({episodeId}) => {
                     <DragDropContext onDragEnd={onDragEnd}>
                         <Droppable droppableId="messages">
                             {(provided) => (
-                                <div className="flex flex-col gap-7" {...provided.droppableProps}
+                                <div className="flex flex-col gap-4" {...provided.droppableProps}
                                      ref={provided.innerRef}>
                                     <div className="">
 
@@ -106,7 +109,8 @@ export const Messages: React.FC<Props> = ({episodeId}) => {
                                                     {...provided.draggableProps}
                                                     {...provided.dragHandleProps}
                                                 >
-                                                    <MessageSingle episodeId={episodeId} setAddPageMenu={setAddPageMenu} addPageMenu={addPageMenu} message={message}/>
+                                                    <MessageSingle episodeId={episodeId} setAddPageMenu={setAddPageMenu}
+                                                                   addPageMenu={addPageMenu} message={message}/>
                                                 </div>
                                             )}
                                         </Draggable>

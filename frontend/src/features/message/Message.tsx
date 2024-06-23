@@ -76,7 +76,7 @@ export const MessageSingle: React.FC<Props> = ({addPageMenu, setAddPageMenu, mes
     }
 
     return (
-        <div>
+        <div className="pb-5">
             <div className="msg border-2 relative p-4 rounded-md bg-gray-800"
                  style={{'borderColor': data.character ? data.character.color : '#ffffff'}}>
                 <div onClick={() => setAddPageMenu(msg.id)}

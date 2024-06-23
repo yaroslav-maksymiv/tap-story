@@ -49,7 +49,7 @@ export const Comments: React.FC<Props> = ({id}) => {
                         </div>}
                     >
                         {comments.map((comment) => (
-                            <div className="mb-4">
+                            <div className="mb-5">
                                 <Comment key={comment.id} comment={comment}/>
                             </div>
                         ))}

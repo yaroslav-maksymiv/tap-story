@@ -243,6 +243,7 @@ export const listStoryMessages = createAsyncThunk('story/messages', async (crede
     url?: string,
     episodeId?: number
     page?: number
+    temporary?: boolean
 }) => {
     const config = {
         headers: {
@@ -259,5 +260,7 @@ export const listStoryMessages = createAsyncThunk('story/messages', async (crede
     if (credentials.url) {
         response.data['loadMore'] = true
     }
+
+    response.data['save'] = !credentials.temporary
     return response.data
 })

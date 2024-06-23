@@ -1,7 +1,6 @@
 import React, {useEffect} from "react";
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
 import {listCategories} from "./categoryThunks";
-import {Loading} from "../../components/Loading";
 
 interface Props {
     category: number | null,
@@ -27,10 +26,6 @@ export const Categories: React.FC<Props> = ({category, setCategory}) => {
 
     return (
         <div className="w-full py-2 flex flex-wrap gap-3 align-center">
-            {loading && <div className="w-full flex justify-center align-center">
-                <Loading/>
-            </div>}
-
             {categories?.length > 0 && categories.map((cat) =>
                 <div
                     key={cat.id}
