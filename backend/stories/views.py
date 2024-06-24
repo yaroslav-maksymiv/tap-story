@@ -24,16 +24,27 @@ class UpdateUserStoryStatusView(APIView):
     def get(self, request):
         user = request.user
         story_id = request.query_params.get('story_id')
+
+        if not story_id:
+            return Response({'error': 'story_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+
         story = get_object_or_404(Story, id=story_id)
         user_story_status = get_object_or_404(UserStoryStatus, user=user, story=story)
+
         if user_story_status.episode and user_story_status.message:
             return Response(UserStoryStatusSerializer(user_story_status).data)
+
+        return Response({'error': 'No status found'}, status=status.HTTP_404_NOT_FOUND)
 
     def post(self, request):
         user = request.user
         story_id = request.data.get('story_id')
         episode_id = request.data.get('episode_id')
         message_id = request.data.get('message_id')
+
+        if not all([story_id, episode_id, message_id]):
+            return Response({'error': 'story_id, episode_id, and message_id are required'},
+                            status=status.HTTP_400_BAD_REQUEST)
 
         story = get_object_or_404(Story, id=story_id)
         episode = get_object_or_404(Episode, id=episode_id)

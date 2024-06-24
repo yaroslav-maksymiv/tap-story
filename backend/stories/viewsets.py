@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from django.db.models import Count
+from django.core.exceptions import PermissionDenied
 from datetime import datetime
 
 from .models import (
@@ -25,6 +26,12 @@ from authentication.serializers import (
 )
 
 User = get_user_model()
+
+
+def check_story_authorship(story, user):
+    if story.author != user:
+        raise PermissionDenied('You do not have permission to perform this action.')
+    return True
 
 
 def get_client_ip(request):
@@ -77,9 +84,12 @@ class StoryViewSet(ModelViewSet):
     def list(self, request, *args, **kwargs):
         queryset = self.queryset.annotate(likes_count=Count('likes'))
         category_id = request.query_params.get('category')
+
         if category_id:
             category = get_object_or_404(Category, pk=category_id)
             queryset = queryset.filter(category=category)
+
+        queryset = queryset.select_related('author', 'category')
         queryset = self.filter_queryset(queryset)
         queryset = self.paginate_queryset(queryset)
         serializer = self.get_serializer(queryset, many=True)
@@ -119,7 +129,7 @@ class StoryViewSet(ModelViewSet):
 
     def update(self, request, pk=None, *args, **kwargs):
         story = self.get_object()
-        if story.author == request.user:
+        if check_story_authorship(story, request.user):
             category = get_object_or_404(Category, id=request.data.get('category'))
 
             update_data = {
@@ -139,11 +149,11 @@ class StoryViewSet(ModelViewSet):
                 updated_story = serializer.save()
                 return Response(self.get_serializer(updated_story).data, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        return Response(status=status.HTTP_403_FORBIDDEN)
 
     @action(detail=False, methods=['GET'], permission_classes=[IsAuthenticated], url_path='my', url_name='my')
     def get_my_stories(self, request, pk=None):
         queryset = self.queryset.filter(author=request.user)
+        queryset = queryset.select_related('author', 'category')
         queryset = self.paginate_queryset(queryset)
         serializer = self.get_serializer(queryset, many=True, context={'request': request})
         return self.get_paginated_response(serializer.data)
@@ -151,14 +161,11 @@ class StoryViewSet(ModelViewSet):
     @action(detail=True, methods=['POST'], url_path='publish', url_name='publish')
     def publish_story(self, request, pk=None):
         story = self.get_object()
-
-        if story.author == request.user:
+        if check_story_authorship(story, request.user):
             story.published = True
             story.publish_date = datetime.now()
             story.save()
-
             return Response(status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_403_FORBIDDEN)
 
     @action(detail=True, methods=['POST'], url_path='toggle-like', url_name='toggle-like')
     def toggle_like(self, request, pk=None):
@@ -175,11 +182,10 @@ class StoryViewSet(ModelViewSet):
     @action(detail=True, methods=['GET'], url_path='characters', url_name='characters')
     def get_characters(self, request, pk=None):
         story = self.get_object()
-        if story.author == request.user:
+        if check_story_authorship(story, request.user):
             queryset = story.characters.all()
             serializer = CharacterSerializer(queryset, many=True)
             return Response(serializer.data)
-        return Response(status=status.HTTP_403_FORBIDDEN)
 
     @action(detail=True, methods=['GET'], url_path='episodes', url_name='episodes')
     def get_episodes(self, request, pk=None):
@@ -192,6 +198,7 @@ class StoryViewSet(ModelViewSet):
     def get_comments(self, request, pk=None):
         story = self.get_object()
         queryset = story.comments.all()
+        queryset = queryset.select_related('author')
         queryset = self.paginate_queryset(queryset)
         serializer = CommentSerializer(queryset, many=True, context={'request': request})
         return self.get_paginated_response(serializer.data)
@@ -199,7 +206,7 @@ class StoryViewSet(ModelViewSet):
     @action(detail=False, methods=['GET'], permission_classes=[IsAuthenticated], url_path='liked', url_name='liked')
     def get_liked(self, request):
         user = request.user
-        queryset = user.stories_liked.all()
+        queryset = user.stories_liked.all().select_related('author', 'category')
         queryset = self.paginate_queryset(queryset)
         serializer = self.get_serializer(queryset, many=True)
         return self.get_paginated_response(serializer.data)
@@ -217,7 +224,7 @@ class CharacterViewSet(ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         story = get_object_or_404(Story, pk=request.data.get('story'))
-        if story.author == request.user:
+        if check_story_authorship(story, request.user):
             character_data = {
                 'name': request.data.get('name'),
                 'story': story.id,
@@ -228,11 +235,10 @@ class CharacterViewSet(ModelViewSet):
                 character = serializer.save()
                 return Response(self.get_serializer(character).data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        return Response(status=status.HTTP_403_FORBIDDEN)
 
     def partial_update(self, request, pk=None, *args, **kwargs):
         instance = self.get_object()
-        if instance.story.author == request.user:
+        if check_story_authorship(instance.story, request.user):
             update_data = {}
             if 'name' in request.data:
                 update_data['name'] = request.data.get('name')
@@ -243,7 +249,6 @@ class CharacterViewSet(ModelViewSet):
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        return Response(status=status.HTTP_403_FORBIDDEN)
 
     def destroy(self, request, pk=None, *args, **kwargs):
         if destroy_by_story_pk(pk, request.user, self.get_queryset()):
@@ -296,7 +301,6 @@ class CommentViewSet(ModelViewSet):
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        return Response(status=status.HTTP_403_FORBIDDEN)
 
     @action(detail=True, methods=['POST'], url_path='toggle-like', url_name='toggle-like')
     def toggle_like(self, request, *args, **kwargs):
@@ -356,7 +360,7 @@ class EpisodeViewSet(ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         story = get_object_or_404(Story, pk=request.data.get('story'))
-        if story.author == request.user:
+        if check_story_authorship(story, request.user):
             episode_data = {
                 'title': request.data.get('title'),
                 'story': story.id
@@ -366,11 +370,10 @@ class EpisodeViewSet(ModelViewSet):
                 character = serializer.save()
                 return Response(self.get_serializer(character).data, status=status.HTTP_201_CREATED)
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        return Response(status=status.HTTP_403_FORBIDDEN)
 
     def update(self, request, *args, **kwargs):
         episode = self.get_object()
-        if episode.story.author == request.user:
+        if check_story_authorship(episode.story, request.user):
             update_data = {
                 'title': request.data.get('title')
             }
@@ -379,7 +382,6 @@ class EpisodeViewSet(ModelViewSet):
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        return Response(status=status.HTTP_403_FORBIDDEN)
 
     def destroy(self, request, pk=None, *args, **kwargs):
         if destroy_by_story_pk(pk, request.user, self.get_queryset()):
@@ -390,6 +392,7 @@ class EpisodeViewSet(ModelViewSet):
     def get_messages(self, request, pk=None):
         episode = get_object_or_404(Episode, pk=pk)
         queryset = episode.messages.all().order_by('order')
+        queryset = queryset.select_related('character')
         paginator = FixedPagePagination()
 
         user_status = UserStoryStatus.objects.filter(user=request.user, story=episode.story).first()
@@ -505,10 +508,9 @@ class MessageViewSet(ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        if instance.episode.story.author == request.user:
+        if check_story_authorship(instance.episode.story, request.user):
             instance.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response(status=status.HTTP_403_FORBIDDEN)
 
     @action(detail=True, methods=['PATCH'], url_path='order', url_name='order')
     def update_order(self, request, pk=None):

@@ -3,6 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
+from django.db import transaction
 
 from .models import (
     Notification
@@ -24,7 +25,10 @@ class NotificationListAPIView(ListAPIView):
         user = self.request.user
         queryset = queryset.filter(recipient=user)
         unread_queryset = queryset.filter(is_read=False)
-        unread_queryset.update(is_read=True)
+
+        with transaction.atomic():
+            unread_queryset.update(is_read=True)
+
         return queryset
 
 
