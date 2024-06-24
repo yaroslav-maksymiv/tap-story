@@ -248,7 +248,8 @@ export const listStoryMessages = createAsyncThunk('story/messages', async (crede
     const config = {
         headers: {
             'Content-Type': 'application/json',
-            'Accept': 'application/json'
+            'Accept': 'application/json',
+            'Authorization': `JWT ${localStorage.getItem('access')}`
         }
     }
 
@@ -262,5 +263,43 @@ export const listStoryMessages = createAsyncThunk('story/messages', async (crede
     }
 
     response.data['save'] = !credentials.temporary
+    return response.data
+})
+
+export const updateStoryStatus = createAsyncThunk('story/updateStatus', async (credentials: {
+    storyId: number,
+    episodeId: number,
+    messageId: number
+}) => {
+    const config = {
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `JWT ${localStorage.getItem('access')}`
+        }
+    }
+
+    const data = {
+        story_id: credentials.storyId,
+        episode_id: credentials.episodeId,
+        message_id: credentials.messageId
+    }
+
+    const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/update-status/`, data, config)
+    return response.data
+})
+
+export const getStoryStatus = createAsyncThunk('story/status', async (credentials: {
+    storyId: number,
+}) => {
+    const config = {
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `JWT ${localStorage.getItem('access')}`
+        }
+    }
+
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/update-status/?story_id=${credentials.storyId}`, config)
     return response.data
 })

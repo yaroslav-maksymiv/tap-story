@@ -63,12 +63,7 @@ export const StoriesSearch: React.FC = () => {
                     </select>
                 </div>
             </div>
-
-            {loading && (
-                <div className="w-full h-full flex justify-center items-center">
-                    <Loading size={50}/>
-                </div>
-            )}
+            
             {stories?.length > 0 && (
                 <InfiniteScroll next={fetchMoreData} hasMore={hasMore}
                                 loader={<div className="w-full py-10 flex justify-center">

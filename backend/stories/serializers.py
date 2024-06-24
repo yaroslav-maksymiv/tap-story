@@ -6,7 +6,7 @@ User = get_user_model()
 from .models import (
     Category, Story, Character,
     Comment, SavedStory, Episode,
-    Message
+    Message, UserStoryStatus
 )
 from authentication.serializers import (
     UserAccountSerializer
@@ -158,3 +158,9 @@ class MessageSerializer(serializers.ModelSerializer):
                 representation['audio_content'] = request.build_absolute_uri(instance.audio_content.url)
 
         return representation
+
+
+class UserStoryStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserStoryStatus
+        fields = ['id', 'user', 'story', 'episode', 'message']

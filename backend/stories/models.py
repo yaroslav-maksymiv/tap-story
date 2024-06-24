@@ -137,3 +137,17 @@ class Message(Timestamp):
 
     def __str__(self):
         return f'{self.character.name if self.character else "AUTHOR"} - {self.message_type}'
+
+
+class UserStoryStatus(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='story_statuses')
+    story = models.ForeignKey(Story, on_delete=models.CASCADE, related_name='user_statuses')
+    episode = models.ForeignKey(Episode, on_delete=models.SET_NULL, null=True, blank=True, related_name='user_statuses')
+    message = models.ForeignKey(Message, on_delete=models.SET_NULL, null=True, blank=True, related_name='user_statuses')
+    last_updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ['user', 'story']
+
+    def __str__(self):
+        return f'{self.user.username} - {self.story.title} - {self.episode.title if self.episode else "No Episode"} - {self.message.message_type if self.message else "No Message"}'

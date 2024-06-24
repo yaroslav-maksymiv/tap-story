@@ -31,6 +31,7 @@ export type Story = {
 type Messages = {
     list: Message[],
     nextLink: string | null
+    prevLink: string | null
     hasMore: boolean
     loading: boolean
     error: string
@@ -64,6 +65,7 @@ const initialState: StoryState = {
         hasMore: true,
         error: '',
         nextLink: null,
+        prevLink: null,
         page: 1
     }
 }
@@ -153,6 +155,7 @@ const storySlice = createSlice({
                     state.messages.list = payload.results
                 }
                 state.messages.nextLink = payload.links.next
+                state.messages.prevLink = payload.links.previous
                 state.messages.hasMore = !!payload.links.next
                 state.messages.page = payload.page
             }

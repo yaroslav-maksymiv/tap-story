@@ -78,6 +78,10 @@ export const Story: React.FC = () => {
         setStoryTabOpened(true)
     }
 
+    const closeStoryTab = () => {
+        setStoryTabOpened(false)
+    }
+
     return (
         <div className="pt-28 text-white">
             {loading ? (
@@ -173,11 +177,11 @@ export const Story: React.FC = () => {
                                 </div>
                             </div>
 
-                            <Popup open={storyTabOpened} closeOnDocumentClick onClose={() => setStoryTabOpened(false)}>
+                            <Popup open={storyTabOpened} closeOnDocumentClick onClose={closeStoryTab}>
                                 <div style={{'backgroundColor': 'rgba(0, 0, 1, 0.8)'}}
                                      className="w-screen h-screen px-20 py-10 flex justify-center items-center relative">
                                     <div className="absolute top-10 right-10 text-white "
-                                         onClick={() => setStoryTabOpened(false)}>
+                                         onClick={closeStoryTab}>
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                              stroke-width="1.5" stroke="currentColor"
                                              className="w-10 h-10 cursor-pointer">
@@ -186,7 +190,7 @@ export const Story: React.FC = () => {
                                         </svg>
                                     </div>
                                     <div className="relative modal w-1/3 h-full bg-gray-900 rounded-md p-4">
-                                        <StoryContent/>
+                                        <StoryContent closeStoryTab={closeStoryTab}/>
                                     </div>
                                 </div>
                             </Popup>

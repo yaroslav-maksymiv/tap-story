@@ -28,6 +28,7 @@ export const EpisodesMenu: React.FC<Props> = ({storyId}) => {
                 setCreateLoading(false)
                 dispatch(listEpisodes({storyId}))
                 setAddMenuVisible(false)
+                setTitle('')
             }).catch(e => {
                 setCreateLoading(false)
             })

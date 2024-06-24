@@ -27,3 +27,8 @@ class EpisodeAdmin(admin.ModelAdmin):
 @admin.register(Message)
 class MessageAdmin(admin.ModelAdmin):
     list_display = ['id', 'episode', 'order', 'message_type']
+
+
+@admin.register(UserStoryStatus)
+class UserStoryStatusAdmin(admin.ModelAdmin):
+    list_display = ['id', 'story', 'episode', 'message']

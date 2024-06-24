@@ -12,7 +12,7 @@ from datetime import datetime
 from .models import (
     Category, Story, Character,
     Comment, IpAddress, SavedStory,
-    Episode, Message
+    Episode, Message, UserStoryStatus
 )
 from .serializers import (
     StorySerializer, CommentSerializer,
@@ -350,7 +350,7 @@ class SavedStoryViewSet(ModelViewSet):
 
 class EpisodeViewSet(ModelViewSet):
     queryset = Episode.objects.all()
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
     serializer_class = EpisodeSerializer
     pagination_class = MyPagePagination
 
@@ -391,6 +391,25 @@ class EpisodeViewSet(ModelViewSet):
         episode = get_object_or_404(Episode, pk=pk)
         queryset = episode.messages.all().order_by('order')
         paginator = FixedPagePagination()
+
+        user_status = UserStoryStatus.objects.filter(user=request.user, story=episode.story).first()
+        page_number = request.GET.get('page', None)
+
+        # If the user has a status entry for the current episode, fetch messages starting from the last read message
+        if not page_number and user_status and user_status.message:
+            last_read_message = user_status.message
+            try:
+                message_index = list(queryset).index(last_read_message)
+                page_number = (message_index // paginator.page_size) + 1
+            except ValueError:
+                page_number = 1
+        else:
+            page_number = 1 if page_number is None else int(page_number)
+
+        request.GET._mutable = True
+        request.GET['page'] = page_number
+        request.GET._mutable = False
+
         queryset = paginator.paginate_queryset(queryset, request, view=self)
         serializer = MessageSerializer(queryset, many=True, context={'request': request})
         return paginator.get_paginated_response(serializer.data)
@@ -499,7 +518,8 @@ class MessageViewSet(ModelViewSet):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
         try:
-            order = validate_unique_order(request.data.get('order'), message.episode, Message.objects.filter(episode=message.episode))
+            order = validate_unique_order(request.data.get('order'), message.episode,
+                                          Message.objects.filter(episode=message.episode))
         except ValidationError as err:
             return Response({'message': str(err.messages[0])}, status=status.HTTP_400_BAD_REQUEST)
 

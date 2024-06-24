@@ -1,12 +1,16 @@
 import React, {useEffect, useRef, useState} from "react";
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
 import {StoryMessage} from "./StoryMessage";
-import {listStoryMessages} from "./storyThunks";
+import {getStoryStatus, listStoryMessages, updateStoryStatus} from "./storyThunks";
 import {Message} from "../message/messageSlice";
 import {listEpisodes} from "../episode/episodeThunk";
 import {resetMessages} from "./storySlice";
 
-export const StoryContent: React.FC = () => {
+interface Props {
+    closeStoryTab: () => void
+}
+
+export const StoryContent: React.FC<Props> = ({closeStoryTab}) => {
     const dispatch = useAppDispatch()
 
     const [visibleMessages, setVisibleMessages] = useState<Message[]>([])
@@ -31,14 +35,25 @@ export const StoryContent: React.FC = () => {
     }, [])
 
     useEffect(() => {
-        if (episodes && episodes.length > 0) {
-            setEpisodeId(episodes[0].id)
+        if (episodes && episodes.length > 0 && story) {
+            let epId = null
+            dispatch(getStoryStatus({storyId: story.id})).then(response => {
+                if (getStoryStatus.fulfilled.match(response)) {
+                    setEpisodeId(response.payload.episode)
+                    epId = response.payload.episode
+                }
+            })
+            if (!epId) {
+                setEpisodeId(episodes[0].id)
+            }
         }
     }, [episodes])
 
     useEffect(() => {
         if (episodeId) {
-            dispatch(listStoryMessages({episodeId: episodeId, page: startPage}))
+            dispatch(listStoryMessages({episodeId: episodeId})).then(response => {
+                setStartPage(response.payload.page)
+            })
         }
     }, [episodeId])
 
@@ -65,6 +80,9 @@ export const StoryContent: React.FC = () => {
                     return [...prev, currMsg]
                 })
                 setCurrentMsgIndex(prev => prev + 1)
+                if (story && episodeId) {
+                    dispatch(updateStoryStatus({storyId: story.id, episodeId: episodeId, messageId: currMsg.id}))
+                }
             }
         }
     }
@@ -138,7 +156,9 @@ export const StoryContent: React.FC = () => {
                 )}
 
                 {hasMorePreviousMessages && visibleMessages.length > 0 && startPage > 1 && (
-                    <div onClick={fetchPreviousMessages} className="w-full text-center cursor-pointer font-bold mb-5 text-gray-800 bg-gray-400 rounded-md">Load Previous</div>
+                    <div onClick={fetchPreviousMessages}
+                         className="w-full text-center cursor-pointer font-bold mb-5 text-gray-800 bg-gray-400 rounded-md">Load
+                        Previous</div>
                 )}
 
                 <div className="flex flex-col gap-3">
@@ -151,16 +171,23 @@ export const StoryContent: React.FC = () => {
                     <div className="w-full text-center bg-gray-800 p-3 py-4 rounded-md">
                         <div className="text-xl font-bold">Congratulations!</div>
                         <div className="text-xl font-bold">It's the end of this episode!</div>
-                        {nextEpisodeId && (
-                            <div className="mt-3">
+                        <div className="mt-3">
+                            {nextEpisodeId ? (
                                 <button
                                     onClick={() => nextEpisode()}
                                     className="flex w-full justify-center rounded-md bg-blue-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                                 >
                                     Next Episode
                                 </button>
-                            </div>
-                        )}
+                            ) : (
+                                <button
+                                    onClick={() => closeStoryTab()}
+                                    className="flex w-full justify-center rounded-md bg-blue-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                >
+                                    Close
+                                </button>
+                            )}
+                        </div>
                     </div>
                 )}
             </div>
