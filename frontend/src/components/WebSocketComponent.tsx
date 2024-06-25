@@ -14,7 +14,8 @@ export const WebSocketComponent: React.FC = () => {
         const notification = JSON.parse(event.data)
         dispatch(addNewNotification(notification))
     }
-    const url = `ws://localhost:8000/ws/notify/?token=${access}`
+
+    const url = `ws://${process.env.REACT_APP_API_DOMAIN}/ws/notify/?token=${access}`
     const {} = useWebSocket(url, {
         onOpen: () => console.log('WebSocket connection opened.'),
         onClose: () => console.log('WebSocket connection closed.'),
