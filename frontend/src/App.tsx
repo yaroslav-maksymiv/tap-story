@@ -14,11 +14,13 @@ import {MyStories} from "./features/story/MyStories";
 import {StoryEdit} from "./features/story/StoryEdit";
 import {StoriesSearch} from "./features/story/StoriesSearch";
 import {Episode} from "./features/episode/Episode";
+import {PasswordReset} from "./features/authentication/PasswordReset";
+import {PasswordResetActivation} from "./features/authentication/PasswordResetActivation";
 
 const App: React.FC = () => {
     return (
         <BrowserRouter>
-            <WebSocketComponent />
+            <WebSocketComponent/>
             <Layout>
                 <Routes>
                     <Route path='/' element={<StoriesSearch/>}/>
@@ -33,6 +35,8 @@ const App: React.FC = () => {
 
                     <Route path='/login' element={<Login/>}/>
                     <Route path='/register' element={<Register/>}/>
+                    <Route path='/password-reset' element={<PasswordReset/>}/>
+                    <Route path='/password/reset/confirm/:uid/:token' element={<PasswordResetActivation/>}/>
                     <Route path='/activate/:uid/:token' element={<AccountActivation/>}/>
                 </Routes>
             </Layout>

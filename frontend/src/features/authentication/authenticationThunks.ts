@@ -52,7 +52,6 @@ export const login = createAsyncThunk('authentication/login', async (credentials
     } catch (err: any) {
         return thunkAPI.rejectWithValue(err.response?.data)
     }
-
 })
 
 export const register = createAsyncThunk('authentication/register', async (credentials: {
@@ -93,6 +92,54 @@ export const activate = createAsyncThunk('authentication/activate', async (crede
 
     try {
         const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/users/activation/`, body, config)
+        return response.data
+    } catch (err: any) {
+        return thunkAPI.rejectWithValue(err.response?.data)
+    }
+})
+
+export const resetPassword = createAsyncThunk('authentication/resetPassword', async (credentials: {
+    email: string
+}, thunkAPI) => {
+
+    const config = {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+
+    const body = JSON.stringify(credentials)
+
+    try {
+        const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/users/reset_password/`, body, config)
+        return response.data
+    } catch (err: any) {
+        return thunkAPI.rejectWithValue(err.response?.data)
+    }
+})
+
+export const resetPasswordConfirm = createAsyncThunk('authentication/resetPasswordConfirm', async (credentials: {
+    uid: string,
+    token: string,
+    password: string,
+    rePassword: string
+}, thunkAPI) => {
+
+    const config = {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+
+    const body = {
+        uid: credentials.uid,
+        token: credentials.token,
+        new_password: credentials.password,
+        re_new_password: credentials.rePassword
+    }
+
+    try {
+        const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/users/reset_password_confirm/`, body, config)
         return response.data
     } catch (err: any) {
         return thunkAPI.rejectWithValue(err.response?.data)

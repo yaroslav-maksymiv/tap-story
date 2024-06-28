@@ -1,5 +1,13 @@
 import {PayloadAction, createSlice} from "@reduxjs/toolkit";
-import {loadUser, login, register, checkIsAuthenticated, activate} from "./authenticationThunks";
+import {
+    loadUser,
+    login,
+    register,
+    checkIsAuthenticated,
+    activate,
+    resetPassword,
+    resetPasswordConfirm
+} from "./authenticationThunks";
 import {createErrorsList} from "../../miscellaneous";
 
 export type User = {
@@ -22,6 +30,8 @@ type AuthenticationState = {
     isRegistered: boolean
     loginLoading: boolean
     registerLoading: boolean
+    passwordResetLoading: boolean
+    passwordResetErrors: string[] | null
 }
 
 const initialState: AuthenticationState = {
@@ -31,10 +41,12 @@ const initialState: AuthenticationState = {
     isAuthenticated: false,
     loginErrors: null,
     registerErrors: null,
+    passwordResetErrors: null,
     isAccountActivated: false,
     isRegistered: false,
     loginLoading: false,
-    registerLoading: false
+    registerLoading: false,
+    passwordResetLoading: false
 }
 
 const setAuthentication = (state: AuthenticationState, isAuthenticated: boolean): void => {
@@ -108,7 +120,7 @@ const authenticationSlice = createSlice({
             state.registerErrors = null
             state.registerLoading = false
         })
-         builder.addCase(register.pending, (state) => {
+        builder.addCase(register.pending, (state) => {
             state.registerLoading = true
         })
         builder.addCase(register.rejected, (state, action) => {
@@ -135,6 +147,44 @@ const authenticationSlice = createSlice({
         })
         builder.addCase(activate.fulfilled, (state) => {
             state.isAccountActivated = true
+        })
+        builder.addCase(resetPassword.pending, (state) => {
+            state.passwordResetLoading = true
+            state.passwordResetErrors = null
+        })
+        builder.addCase(resetPassword.fulfilled, (state) => {
+            state.passwordResetLoading = false
+        })
+        builder.addCase(resetPassword.rejected, (state, action) => {
+            state.passwordResetLoading = false
+            if (action.payload) {
+                if (Object.keys(action.payload).length > 1) {
+                    state.passwordResetErrors = createErrorsList(action.payload)
+                } else {
+                    state.passwordResetErrors = [Object.values(action.payload)[0]]
+                }
+            } else {
+                state.passwordResetErrors = action.error.message ? [action.error.message] : null
+            }
+        })
+        builder.addCase(resetPasswordConfirm.pending, (state) => {
+            state.passwordResetLoading = true
+            state.passwordResetErrors = null
+        })
+        builder.addCase(resetPasswordConfirm.fulfilled, (state) => {
+            state.passwordResetLoading = false
+        })
+        builder.addCase(resetPasswordConfirm.rejected, (state, action) => {
+            state.passwordResetLoading = false
+            if (action.payload) {
+                if (Object.keys(action.payload).length > 1) {
+                    state.passwordResetErrors = createErrorsList(action.payload)
+                } else {
+                    state.passwordResetErrors = [Object.values(action.payload)[0]]
+                }
+            } else {
+                state.passwordResetErrors = action.error.message ? [action.error.message] : null
+            }
         })
     }
 })
